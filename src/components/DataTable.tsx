@@ -9,7 +9,17 @@ interface TableRow {
   id: string;
   time: string;
   surname: string;
+  color: string;
 }
+
+const colorOptions = [
+  { value: 'red', label: 'Красный', border: 'border-red-500', bg: 'bg-red-50', hover: 'hover:bg-red-100', text: 'text-red-700' },
+  { value: 'blue', label: 'Синий', border: 'border-blue-500', bg: 'bg-blue-50', hover: 'hover:bg-blue-100', text: 'text-blue-700' },
+  { value: 'green', label: 'Зелёный', border: 'border-green-500', bg: 'bg-green-50', hover: 'hover:bg-green-100', text: 'text-green-700' },
+  { value: 'yellow', label: 'Жёлтый', border: 'border-yellow-500', bg: 'bg-yellow-50', hover: 'hover:bg-yellow-100', text: 'text-yellow-700' },
+  { value: 'purple', label: 'Фиолетовый', border: 'border-purple-500', bg: 'bg-purple-50', hover: 'hover:bg-purple-100', text: 'text-purple-700' },
+  { value: 'pink', label: 'Розовый', border: 'border-pink-500', bg: 'bg-pink-50', hover: 'hover:bg-pink-100', text: 'text-pink-700' },
+];
 
 const generateTimeSlots = () => {
   const slots = [];
@@ -27,17 +37,17 @@ export const DataTable = () => {
   const timeSlots = generateTimeSlots();
   
   const [data, setData] = useState<TableRow[]>([
-    { id: '1', time: '09:00', surname: 'Иванов' },
-    { id: '2', time: '09:15', surname: 'Петров' },
-    { id: '3', time: '09:30', surname: 'Сидоров' },
+    { id: '1', time: '09:00', surname: 'Иванов', color: 'red' },
+    { id: '2', time: '09:15', surname: 'Петров', color: 'blue' },
+    { id: '3', time: '09:30', surname: 'Сидоров', color: 'green' },
   ]);
   
-  const [editingCell, setEditingCell] = useState<{ id: string; field: 'time' | 'surname' } | null>(null);
+  const [editingCell, setEditingCell] = useState<{ id: string; field: 'time' | 'surname' | 'color' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
-  const handleEdit = (id: string, field: 'time' | 'surname', currentValue: string) => {
+  const handleEdit = (id: string, field: 'time' | 'surname' | 'color', currentValue: string) => {
     setEditingCell({ id, field });
     setEditValue(currentValue);
   };
@@ -81,7 +91,7 @@ export const DataTable = () => {
       newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
     }
     
-    setData([...data, { id: newId, time: newTime, surname: '' }]);
+    setData([...data, { id: newId, time: newTime, surname: '', color: 'red' }]);
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
@@ -157,6 +167,9 @@ export const DataTable = () => {
                 <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
                   Фамилия
                 </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
+                  Цвет
+                </th>
                 <th className="px-6 py-4 text-center text-sm font-semibold text-secondary-foreground uppercase tracking-wider w-32">
                   Действия
                 </th>
@@ -218,9 +231,36 @@ export const DataTable = () => {
                         className="cursor-move transition-colors font-medium flex items-center gap-2"
                       >
                         <Icon name="GripVertical" size={16} className="text-muted-foreground" />
-                        <div className="border-2 border-red-500 rounded-lg px-4 py-2 bg-red-50 hover:bg-red-100 transition-colors shadow-sm">
-                          <span className="text-red-700 font-semibold">{row.surname || '—'}</span>
+                        <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-4 py-2 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
+                          <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold`}>{row.surname || '—'}</span>
                         </div>
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {editingCell?.id === row.id && editingCell.field === 'color' ? (
+                      <Select value={editValue} onValueChange={setEditValue}>
+                        <SelectTrigger className="max-w-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {colorOptions.map(color => (
+                            <SelectItem key={color.value} value={color.value}>
+                              <div className="flex items-center gap-2">
+                                <div className={`w-4 h-4 rounded ${color.bg} border-2 ${color.border}`}></div>
+                                {color.label}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div 
+                        onClick={() => handleEdit(row.id, 'color', row.color)}
+                        className="cursor-pointer flex items-center gap-2"
+                      >
+                        <div className={`w-6 h-6 rounded border-2 ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
+                        <span className="text-sm text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
                       </div>
                     )}
                   </td>
