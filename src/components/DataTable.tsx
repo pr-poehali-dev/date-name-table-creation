@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
@@ -189,9 +189,9 @@ export const DataTable = () => {
                 const isNewDay = index === 0 || data[index - 1].date !== row.date;
                 
                 return (
-                  <>
+                  <React.Fragment key={`fragment-${row.id}`}>
                     {isNewDay && (
-                      <tr key={`date-${row.date}`}>
+                      <tr key={`date-${row.date}-${index}`}>
                         <td colSpan={4} className="bg-secondary/50 px-6 py-3">
                           <div className="flex items-center gap-2">
                             <Icon name="Calendar" size={18} className="text-secondary-foreground" />
@@ -208,7 +208,7 @@ export const DataTable = () => {
                       </tr>
                     )}
                     <tr 
-                      key={row.id} 
+                      key={`row-${row.id}`} 
                       className={`transition-colors ${
                         dragOverId === row.id ? 'bg-accent/20' : 'hover:bg-muted/50'
                       } ${draggedId === row.id ? 'opacity-50' : ''}`}
@@ -326,7 +326,7 @@ export const DataTable = () => {
                     </div>
                   </td>
                 </tr>
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>
