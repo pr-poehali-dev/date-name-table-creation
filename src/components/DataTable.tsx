@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface TableRow {
   id: string;
+  date: string;
   time: string;
   surname: string;
   color: string;
@@ -37,17 +38,17 @@ export const DataTable = () => {
   const timeSlots = generateTimeSlots();
   
   const [data, setData] = useState<TableRow[]>([
-    { id: '1', time: '09:00', surname: 'Иванов', color: 'red' },
-    { id: '2', time: '09:15', surname: 'Петров', color: 'blue' },
-    { id: '3', time: '09:30', surname: 'Сидоров', color: 'green' },
+    { id: '1', date: '2025-01-20', time: '09:00', surname: 'Иванов', color: 'red' },
+    { id: '2', date: '2025-01-20', time: '09:15', surname: 'Петров', color: 'blue' },
+    { id: '3', date: '2025-01-20', time: '09:30', surname: 'Сидоров', color: 'green' },
   ]);
   
-  const [editingCell, setEditingCell] = useState<{ id: string; field: 'time' | 'surname' | 'color' } | null>(null);
+  const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
-  const handleEdit = (id: string, field: 'time' | 'surname' | 'color', currentValue: string) => {
+  const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color', currentValue: string) => {
     setEditingCell({ id, field });
     setEditValue(currentValue);
   };
@@ -77,13 +78,21 @@ export const DataTable = () => {
     const newId = (Math.max(...data.map(r => parseInt(r.id)), 0) + 1).toString();
     
     let newTime = '09:00';
+    let newDate = new Date().toISOString().split('T')[0];
+    
     if (data.length > 0) {
-      const lastTime = data[data.length - 1].time;
+      const lastRow = data[data.length - 1];
+      const lastTime = lastRow.time;
       const [hours, minutes] = lastTime.split(':').map(Number);
       let totalMinutes = hours * 60 + minutes + 15;
       
       if (totalMinutes >= 1440) {
         totalMinutes = 0;
+        const lastDate = new Date(lastRow.date);
+        lastDate.setDate(lastDate.getDate() + 1);
+        newDate = lastDate.toISOString().split('T')[0];
+      } else {
+        newDate = lastRow.date;
       }
       
       const newHours = Math.floor(totalMinutes / 60);
@@ -91,7 +100,7 @@ export const DataTable = () => {
       newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
     }
     
-    setData([...data, { id: newId, time: newTime, surname: '', color: 'red' }]);
+    setData([...data, { id: newId, date: newDate, time: newTime, surname: '', color: 'red' }]);
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
@@ -176,17 +185,38 @@ export const DataTable = () => {
               </tr>
             </thead>
             <tbody className="bg-card divide-y divide-border">
-              {data.map((row) => (
-                <tr 
-                  key={row.id} 
-                  className={`transition-colors ${
-                    dragOverId === row.id ? 'bg-accent/20' : 'hover:bg-muted/50'
-                  } ${draggedId === row.id ? 'opacity-50' : ''}`}
-                  onDragOver={(e) => handleDragOver(e, row.id)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, row.id)}
-                >
-                  <td className="px-6 py-4">
+              {data.map((row, index) => {
+                const isNewDay = index === 0 || data[index - 1].date !== row.date;
+                
+                return (
+                  <>
+                    {isNewDay && (
+                      <tr key={`date-${row.date}`}>
+                        <td colSpan={4} className="bg-secondary/50 px-6 py-3">
+                          <div className="flex items-center gap-2">
+                            <Icon name="Calendar" size={18} className="text-secondary-foreground" />
+                            <span className="font-semibold text-secondary-foreground">
+                              {new Date(row.date).toLocaleDateString('ru-RU', { 
+                                weekday: 'long', 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                              })}
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    <tr 
+                      key={row.id} 
+                      className={`transition-colors ${
+                        dragOverId === row.id ? 'bg-accent/20' : 'hover:bg-muted/50'
+                      } ${draggedId === row.id ? 'opacity-50' : ''}`}
+                      onDragOver={(e) => handleDragOver(e, row.id)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, row.id)}
+                    >
+                      <td className="px-6 py-4">
                     {editingCell?.id === row.id && editingCell.field === 'time' ? (
                       <Select value={editValue} onValueChange={setEditValue}>
                         <SelectTrigger className="max-w-xs">
@@ -296,7 +326,9 @@ export const DataTable = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+                  </>
+                );
+              })}
             </tbody>
           </table>
         </div>
