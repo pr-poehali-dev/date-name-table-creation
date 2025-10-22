@@ -19,6 +19,8 @@ export const DataTable = () => {
   
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'surname' } | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   const handleEdit = (id: string, field: 'date' | 'surname', currentValue: string) => {
     setEditingCell({ id, field });
@@ -49,6 +51,51 @@ export const DataTable = () => {
   const handleAdd = () => {
     const newId = (Math.max(...data.map(r => parseInt(r.id))) + 1).toString();
     setData([...data, { id: newId, date: new Date().toISOString().split('T')[0], surname: '' }]);
+  };
+
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedId(id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverId(id);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverId(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    const draggedRow = data.find(row => row.id === draggedId);
+    const targetRow = data.find(row => row.id === targetId);
+
+    if (draggedRow && targetRow) {
+      setData(data.map(row => {
+        if (row.id === draggedId) {
+          return { ...row, date: targetRow.date };
+        }
+        return row;
+      }));
+    }
+
+    setDraggedId(null);
+    setDragOverId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
+    setDragOverId(null);
   };
 
   return (
@@ -86,7 +133,15 @@ export const DataTable = () => {
             </thead>
             <tbody className="bg-card divide-y divide-border">
               {data.map((row) => (
-                <tr key={row.id} className="hover:bg-muted/50 transition-colors">
+                <tr 
+                  key={row.id} 
+                  className={`transition-colors ${
+                    dragOverId === row.id ? 'bg-accent/20' : 'hover:bg-muted/50'
+                  } ${draggedId === row.id ? 'opacity-50' : ''}`}
+                  onDragOver={(e) => handleDragOver(e, row.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, row.id)}
+                >
                   <td className="px-6 py-4">
                     {editingCell?.id === row.id && editingCell.field === 'date' ? (
                       <Input
@@ -124,9 +179,13 @@ export const DataTable = () => {
                       />
                     ) : (
                       <div 
+                        draggable={!editingCell}
+                        onDragStart={(e) => handleDragStart(e, row.id)}
+                        onDragEnd={handleDragEnd}
                         onClick={() => handleEdit(row.id, 'surname', row.surname)}
-                        className="cursor-pointer text-foreground hover:text-accent transition-colors font-medium"
+                        className="cursor-move text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2"
                       >
+                        <Icon name="GripVertical" size={16} className="text-muted-foreground" />
                         {row.surname || '—'}
                       </div>
                     )}
