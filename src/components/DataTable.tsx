@@ -65,7 +65,23 @@ export const DataTable = () => {
 
   const handleAdd = () => {
     const newId = (Math.max(...data.map(r => parseInt(r.id)), 0) + 1).toString();
-    setData([...data, { id: newId, time: '09:00', surname: '' }]);
+    
+    let newTime = '09:00';
+    if (data.length > 0) {
+      const lastTime = data[data.length - 1].time;
+      const [hours, minutes] = lastTime.split(':').map(Number);
+      let totalMinutes = hours * 60 + minutes + 15;
+      
+      if (totalMinutes >= 1440) {
+        totalMinutes = 0;
+      }
+      
+      const newHours = Math.floor(totalMinutes / 60);
+      const newMinutes = totalMinutes % 60;
+      newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
+    }
+    
+    setData([...data, { id: newId, time: newTime, surname: '' }]);
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
