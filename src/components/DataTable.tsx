@@ -50,6 +50,9 @@ export const DataTable = () => {
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [isOverReserve, setIsOverReserve] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [newReserveName, setNewReserveName] = useState('');
+  const [isAddingToReserve, setIsAddingToReserve] = useState(false);
   
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' } | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -224,11 +227,28 @@ export const DataTable = () => {
     setIsOverReserve(false);
   };
 
+  const handleAddToReserve = () => {
+    if (!newReserveName.trim()) return;
+    
+    const newId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
+    setReserve([...reserve, { id: newId, surname: newReserveName.trim(), color: 'blue' }]);
+    setNewReserveName('');
+    setIsAddingToReserve(false);
+  };
+
+  const filteredReserve = reserve.filter(item => 
+    item.surname.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredData = data.filter(row => 
+    row.surname.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="w-full max-w-7xl mx-auto p-6 flex gap-6">
       <Card className="flex-1 overflow-hidden">
         <div className="bg-primary p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-primary-foreground tracking-tight">
               DATA DASHBOARD
             </h1>
@@ -239,6 +259,16 @@ export const DataTable = () => {
               <Icon name="Plus" size={16} className="mr-2" />
               Добавить запись
             </Button>
+          </div>
+          <div className="relative">
+            <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-foreground/60" />
+            <Input
+              type="text"
+              placeholder="Поиск по фамилии..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
+            />
           </div>
         </div>
 
@@ -261,8 +291,8 @@ export const DataTable = () => {
               </tr>
             </thead>
             <tbody className="bg-card divide-y divide-border">
-              {data.map((row, index) => {
-                const isNewDay = index === 0 || data[index - 1].date !== row.date;
+              {(searchQuery ? filteredData : data).map((row, index, array) => {
+                const isNewDay = index === 0 || array[index - 1].date !== row.date;
                 
                 return (
                   <React.Fragment key={`fragment-${row.id}`}>
@@ -430,24 +460,72 @@ export const DataTable = () => {
         onDragLeave={handleReserveDragLeave}
         onDrop={handleDropToReserve}
       >
-        <div className="bg-secondary p-6">
-          <div className="flex items-center gap-2">
-            <Icon name="Users" size={20} className="text-secondary-foreground" />
-            <h2 className="text-lg font-bold text-secondary-foreground tracking-tight">
-              Резерв
-            </h2>
+        <div className="bg-secondary p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Icon name="Users" size={20} className="text-secondary-foreground" />
+              <h2 className="text-lg font-bold text-secondary-foreground tracking-tight">
+                Резерв
+              </h2>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setIsAddingToReserve(true)}
+              variant="outline"
+              className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10"
+            >
+              <Icon name="UserPlus" size={16} />
+            </Button>
           </div>
+
+          {isAddingToReserve && (
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Введите фамилию..."
+                value={newReserveName}
+                onChange={(e) => setNewReserveName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddToReserve();
+                  if (e.key === 'Escape') {
+                    setIsAddingToReserve(false);
+                    setNewReserveName('');
+                  }
+                }}
+                className="flex-1 bg-secondary-foreground/10 border-secondary-foreground/20"
+                autoFocus
+              />
+              <Button
+                size="sm"
+                onClick={handleAddToReserve}
+                className="bg-accent hover:bg-accent/90"
+              >
+                <Icon name="Check" size={16} />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setIsAddingToReserve(false);
+                  setNewReserveName('');
+                }}
+                className="border-secondary-foreground/20"
+              >
+                <Icon name="X" size={16} />
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="p-4 space-y-2 min-h-[400px]">
-          {reserve.length === 0 ? (
+          {filteredReserve.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Icon name="UserX" size={48} className="mx-auto mb-4 opacity-20" />
-              <p className="text-sm">Резерв пуст</p>
-              <p className="text-xs mt-2">Перетащите сюда фамилии</p>
+              <p className="text-sm">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
+              <p className="text-xs mt-2">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
             </div>
           ) : (
-            reserve.map((item) => (
+            filteredReserve.map((item) => (
               <div
                 key={item.id}
                 draggable
