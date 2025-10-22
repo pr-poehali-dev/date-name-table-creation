@@ -43,10 +43,19 @@ export const DataTable = () => {
     { id: '3', date: '2025-01-20', time: '09:30', surname: 'Сидоров', color: 'green' },
   ]);
   
+  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string}>>([
+    { id: 'r1', surname: 'Алексеев', color: 'purple' },
+    { id: 'r2', surname: 'Новиков', color: 'pink' },
+  ]);
+  
+  const [draggedFromReserve, setDraggedFromReserve] = useState(false);
+  const [isOverReserve, setIsOverReserve] = useState(false);
+  
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [draggedItem, setDraggedItem] = useState<{surname: string; color: string} | null>(null);
 
   const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color', currentValue: string) => {
     setEditingCell({ id, field });
@@ -104,7 +113,22 @@ export const DataTable = () => {
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
-    setDraggedId(id);
+    const row = data.find(r => r.id === id);
+    if (row) {
+      setDraggedItem({ surname: row.surname, color: row.color });
+      setDraggedId(id);
+      setDraggedFromReserve(false);
+    }
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleReserveDragStart = (e: React.DragEvent, id: string) => {
+    const item = reserve.find(r => r.id === id);
+    if (item) {
+      setDraggedItem({ surname: item.surname, color: item.color });
+      setDraggedId(id);
+      setDraggedFromReserve(true);
+    }
     e.dataTransfer.effectAllowed = 'move';
   };
 
@@ -114,43 +138,95 @@ export const DataTable = () => {
     setDragOverId(id);
   };
 
+  const handleReserveDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setIsOverReserve(true);
+  };
+
+  const handleReserveDragLeave = () => {
+    setIsOverReserve(false);
+  };
+
   const handleDragLeave = () => {
     setDragOverId(null);
+  };
+
+  const handleDropToReserve = (e: React.DragEvent) => {
+    e.preventDefault();
+    
+    if (!draggedId || draggedFromReserve) {
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverReserve(false);
+      return;
+    }
+
+    const draggedRow = data.find(row => row.id === draggedId);
+    if (draggedRow && draggedRow.surname) {
+      const newReserveId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
+      setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color }]);
+      setData(data.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+    }
+
+    setDraggedId(null);
+    setDraggedItem(null);
+    setIsOverReserve(false);
   };
 
   const handleDrop = (e: React.DragEvent, targetId: string) => {
     e.preventDefault();
     
-    if (!draggedId || draggedId === targetId) {
-      setDraggedId(null);
+    if (!draggedId) {
       setDragOverId(null);
       return;
     }
 
-    const draggedRow = data.find(row => row.id === draggedId);
-    const targetRow = data.find(row => row.id === targetId);
+    if (draggedFromReserve && draggedItem) {
+      setData(data.map(row => 
+        row.id === targetId 
+          ? { ...row, surname: draggedItem.surname, color: draggedItem.color }
+          : row
+      ));
+      setReserve(reserve.filter(r => r.id !== draggedId));
+    } else {
+      if (draggedId === targetId) {
+        setDraggedId(null);
+        setDragOverId(null);
+        setDraggedItem(null);
+        return;
+      }
 
-    if (draggedRow && targetRow) {
-      setData(data.map(row => {
-        if (row.id === draggedId) {
-          return { ...row, time: targetRow.time };
-        }
-        return row;
-      }));
+      const draggedRow = data.find(row => row.id === draggedId);
+      const targetRow = data.find(row => row.id === targetId);
+
+      if (draggedRow && targetRow) {
+        setData(data.map(row => {
+          if (row.id === draggedId) {
+            return { ...row, date: targetRow.date, time: targetRow.time };
+          }
+          return row;
+        }));
+      }
     }
 
     setDraggedId(null);
     setDragOverId(null);
+    setDraggedItem(null);
+    setDraggedFromReserve(false);
   };
 
   const handleDragEnd = () => {
     setDraggedId(null);
     setDragOverId(null);
+    setDraggedItem(null);
+    setDraggedFromReserve(false);
+    setIsOverReserve(false);
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-6">
-      <Card className="overflow-hidden">
+    <div className="w-full max-w-7xl mx-auto p-6 flex gap-6">
+      <Card className="flex-1 overflow-hidden">
         <div className="bg-primary p-6">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-primary-foreground tracking-tight">
@@ -344,6 +420,55 @@ export const DataTable = () => {
         <div className="bg-muted px-6 py-4 border-t border-border">
           <p className="text-sm text-muted-foreground">
             Всего записей: <span className="font-semibold text-foreground">{data.length}</span>
+          </p>
+        </div>
+      </Card>
+
+      <Card 
+        className={`w-80 overflow-hidden transition-colors ${isOverReserve ? 'ring-2 ring-accent' : ''}`}
+        onDragOver={handleReserveDragOver}
+        onDragLeave={handleReserveDragLeave}
+        onDrop={handleDropToReserve}
+      >
+        <div className="bg-secondary p-6">
+          <div className="flex items-center gap-2">
+            <Icon name="Users" size={20} className="text-secondary-foreground" />
+            <h2 className="text-lg font-bold text-secondary-foreground tracking-tight">
+              Резерв
+            </h2>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-2 min-h-[400px]">
+          {reserve.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Icon name="UserX" size={48} className="mx-auto mb-4 opacity-20" />
+              <p className="text-sm">Резерв пуст</p>
+              <p className="text-xs mt-2">Перетащите сюда фамилии</p>
+            </div>
+          ) : (
+            reserve.map((item) => (
+              <div
+                key={item.id}
+                draggable
+                onDragStart={(e) => handleReserveDragStart(e, item.id)}
+                onDragEnd={handleDragEnd}
+                className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+              >
+                <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-4 py-3 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-2`}>
+                  <Icon name="GripVertical" size={16} className="text-muted-foreground" />
+                  <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold`}>
+                    {item.surname}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="bg-muted px-6 py-4 border-t border-border">
+          <p className="text-sm text-muted-foreground">
+            В резерве: <span className="font-semibold text-foreground">{reserve.length}</span>
           </p>
         </div>
       </Card>
