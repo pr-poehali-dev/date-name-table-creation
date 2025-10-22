@@ -3,26 +3,41 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface TableRow {
   id: string;
-  date: string;
+  time: string;
   surname: string;
 }
 
+const generateTimeSlots = () => {
+  const slots = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 15) {
+      const h = hour.toString().padStart(2, '0');
+      const m = minute.toString().padStart(2, '0');
+      slots.push(`${h}:${m}`);
+    }
+  }
+  return slots;
+};
+
 export const DataTable = () => {
+  const timeSlots = generateTimeSlots();
+  
   const [data, setData] = useState<TableRow[]>([
-    { id: '1', date: '2025-01-15', surname: 'Иванов' },
-    { id: '2', date: '2025-01-16', surname: 'Петров' },
-    { id: '3', date: '2025-01-17', surname: 'Сидоров' },
+    { id: '1', time: '09:00', surname: 'Иванов' },
+    { id: '2', time: '09:15', surname: 'Петров' },
+    { id: '3', time: '09:30', surname: 'Сидоров' },
   ]);
   
-  const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'surname' } | null>(null);
+  const [editingCell, setEditingCell] = useState<{ id: string; field: 'time' | 'surname' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
-  const handleEdit = (id: string, field: 'date' | 'surname', currentValue: string) => {
+  const handleEdit = (id: string, field: 'time' | 'surname', currentValue: string) => {
     setEditingCell({ id, field });
     setEditValue(currentValue);
   };
@@ -49,8 +64,8 @@ export const DataTable = () => {
   };
 
   const handleAdd = () => {
-    const newId = (Math.max(...data.map(r => parseInt(r.id))) + 1).toString();
-    setData([...data, { id: newId, date: new Date().toISOString().split('T')[0], surname: '' }]);
+    const newId = (Math.max(...data.map(r => parseInt(r.id)), 0) + 1).toString();
+    setData([...data, { id: newId, time: '09:00', surname: '' }]);
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
@@ -83,7 +98,7 @@ export const DataTable = () => {
     if (draggedRow && targetRow) {
       setData(data.map(row => {
         if (row.id === draggedId) {
-          return { ...row, date: targetRow.date };
+          return { ...row, time: targetRow.time };
         }
         return row;
       }));
@@ -121,7 +136,7 @@ export const DataTable = () => {
             <thead>
               <tr className="bg-secondary border-b border-border">
                 <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
-                  Дата
+                  Время
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
                   Фамилия
@@ -143,24 +158,25 @@ export const DataTable = () => {
                   onDrop={(e) => handleDrop(e, row.id)}
                 >
                   <td className="px-6 py-4">
-                    {editingCell?.id === row.id && editingCell.field === 'date' ? (
-                      <Input
-                        type="date"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleSave();
-                          if (e.key === 'Escape') handleCancel();
-                        }}
-                        className="max-w-xs"
-                        autoFocus
-                      />
+                    {editingCell?.id === row.id && editingCell.field === 'time' ? (
+                      <Select value={editValue} onValueChange={setEditValue}>
+                        <SelectTrigger className="max-w-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeSlots.map(slot => (
+                            <SelectItem key={slot} value={slot}>
+                              {slot}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     ) : (
                       <div 
-                        onClick={() => handleEdit(row.id, 'date', row.date)}
-                        className="cursor-pointer text-foreground hover:text-accent transition-colors"
+                        onClick={() => handleEdit(row.id, 'time', row.time)}
+                        className="cursor-pointer text-foreground hover:text-accent transition-colors font-mono"
                       >
-                        {new Date(row.date).toLocaleDateString('ru-RU')}
+                        {row.time}
                       </div>
                     )}
                   </td>
