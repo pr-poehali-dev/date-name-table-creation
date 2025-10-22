@@ -215,10 +215,12 @@ export const DataTable = () => {
                         onDragStart={(e) => handleDragStart(e, row.id)}
                         onDragEnd={handleDragEnd}
                         onClick={() => handleEdit(row.id, 'surname', row.surname)}
-                        className="cursor-move text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2"
+                        className="cursor-move transition-colors font-medium flex items-center gap-2"
                       >
                         <Icon name="GripVertical" size={16} className="text-muted-foreground" />
-                        {row.surname || '—'}
+                        <div className="border-2 border-red-500 rounded-lg px-4 py-2 bg-red-50 hover:bg-red-100 transition-colors shadow-sm">
+                          <span className="text-red-700 font-semibold">{row.surname || '—'}</span>
+                        </div>
                       </div>
                     )}
                   </td>
