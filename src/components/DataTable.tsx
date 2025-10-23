@@ -142,35 +142,36 @@ const SingleTable: React.FC<SingleTableProps> = ({
 
   return (
     <Card className="flex-1 overflow-hidden">
-      <div className="bg-primary p-6">
+      <div className="bg-primary p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary-foreground tracking-tight">
+          <h1 className="text-xl font-bold text-primary-foreground tracking-tight">
             {title}
           </h1>
           <Button 
             onClick={handleAdd}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+            className="bg-accent hover:bg-accent/90 text-accent-foreground h-8 text-sm"
+            size="sm"
           >
-            <Icon name="Plus" size={16} className="mr-2" />
-            Добавить запись
+            <Icon name="Plus" size={14} className="mr-1" />
+            Добавить
           </Button>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[calc(100vh-280px)] overflow-y-auto">
         <table className="w-full">
-          <thead>
+          <thead className="sticky top-0 z-10">
             <tr className="bg-secondary border-b border-border">
-              <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-secondary-foreground uppercase tracking-wider">
                 Время
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-secondary-foreground uppercase tracking-wider">
                 Фамилия
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-secondary-foreground uppercase tracking-wider">
                 Цвет
               </th>
-              <th className="px-6 py-4 text-center text-sm font-semibold text-secondary-foreground uppercase tracking-wider w-32">
+              <th className="px-4 py-3 text-center text-xs font-semibold text-secondary-foreground uppercase tracking-wider w-24">
                 Действия
               </th>
             </tr>
@@ -182,15 +183,14 @@ const SingleTable: React.FC<SingleTableProps> = ({
               return (
                 <React.Fragment key={`fragment-${row.id}`}>
                   {isNewDay && (
-                    <tr key={`date-${row.date}-${index}`}>
-                      <td colSpan={4} className="bg-secondary/50 px-6 py-3">
+                    <tr key={`date-${row.date}-${index}`} className="sticky top-12 z-10">
+                      <td colSpan={4} className="bg-secondary px-4 py-2">
                         <div className="flex items-center gap-2">
-                          <Icon name="Calendar" size={18} className="text-secondary-foreground" />
-                          <span className="font-semibold text-secondary-foreground">
+                          <Icon name="Calendar" size={16} className="text-secondary-foreground" />
+                          <span className="font-semibold text-xs text-secondary-foreground">
                             {new Date(row.date).toLocaleDateString('ru-RU', { 
-                              weekday: 'long', 
-                              year: 'numeric', 
-                              month: 'long', 
+                              weekday: 'short', 
+                              month: 'short', 
                               day: 'numeric' 
                             })}
                           </span>
@@ -238,13 +238,13 @@ const SingleTable: React.FC<SingleTableProps> = ({
                       ) : (
                         <div 
                           onClick={() => handleEdit(row.id, 'time', row.time)}
-                          className="cursor-pointer text-foreground hover:text-accent transition-colors font-mono"
+                          className="cursor-pointer text-foreground hover:text-accent transition-colors font-mono text-sm"
                         >
                           {row.time}
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-2">
                       {editingCell?.id === row.id && editingCell.field === 'surname' ? (
                         <Input
                           type="text"
@@ -254,7 +254,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             if (e.key === 'Enter') handleSave();
                             if (e.key === 'Escape') handleCancel();
                           }}
-                          className="max-w-xs"
+                          className="max-w-xs text-sm"
                           autoFocus
                         />
                       ) : (
@@ -263,16 +263,16 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           onDragStart={(e) => handleDragStart(e, row.id)}
                           onDragEnd={onDragEnd}
                           onClick={() => handleEdit(row.id, 'surname', row.surname)}
-                          className="cursor-move transition-colors font-medium flex items-center gap-2"
+                          className="cursor-move transition-colors font-medium flex items-center gap-1"
                         >
-                          <Icon name="GripVertical" size={16} className="text-muted-foreground" />
-                          <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-4 py-2 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
-                            <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold`}>{row.surname || '—'}</span>
+                          <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                          <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
+                            <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
                           </div>
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-2">
                       {editingCell?.id === row.id && editingCell.field === 'color' ? (
                         <Select value={editValue} onValueChange={setEditValue}>
                           <SelectTrigger className="max-w-xs">
@@ -292,30 +292,31 @@ const SingleTable: React.FC<SingleTableProps> = ({
                       ) : (
                         <div 
                           onClick={() => handleEdit(row.id, 'color', row.color)}
-                          className="cursor-pointer flex items-center gap-2"
+                          className="cursor-pointer flex items-center gap-1"
                         >
-                          <div className={`w-6 h-6 rounded border-2 ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
-                          <span className="text-sm text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
+                          <div className={`w-5 h-5 rounded border-2 ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
+                          <span className="text-xs text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="px-4 py-2">
+                      <div className="flex items-center justify-center gap-1">
                         {editingCell?.id === row.id ? (
                           <>
                             <Button
                               size="sm"
                               onClick={handleSave}
-                              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                              className="bg-accent hover:bg-accent/90 text-accent-foreground h-7 w-7 p-0"
                             >
-                              <Icon name="Check" size={16} />
+                              <Icon name="Check" size={14} />
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={handleCancel}
+                              className="h-7 w-7 p-0"
                             >
-                              <Icon name="X" size={16} />
+                              <Icon name="X" size={14} />
                             </Button>
                           </>
                         ) : (
@@ -323,8 +324,9 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             size="sm"
                             variant="destructive"
                             onClick={() => handleDelete(row.id)}
+                            className="h-7 w-7 p-0"
                           >
-                            <Icon name="Trash2" size={16} />
+                            <Icon name="Trash2" size={14} />
                           </Button>
                         )}
                       </div>
@@ -454,23 +456,23 @@ export const DataTable = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-background p-6">
-      <div className="max-w-[1800px] mx-auto mb-6">
-        <div className="bg-primary p-6 rounded-lg">
+    <div className="w-full min-h-screen bg-background p-4">
+      <div className="max-w-[1800px] mx-auto mb-4">
+        <div className="bg-primary p-4 rounded-lg">
           <div className="relative max-w-md">
-            <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-foreground/60" />
+            <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-foreground/60" />
             <Input
               type="text"
               placeholder="Поиск по фамилии..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
+              className="pl-9 h-9 text-sm bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
             />
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto flex gap-6">
+      <div className="max-w-[1800px] mx-auto flex gap-4">
         <SingleTable 
           title="ТАБЛИЦА 1"
           initialData={data1}
@@ -498,7 +500,7 @@ export const DataTable = () => {
         />
 
         <Card 
-          className="w-80 shrink-0 overflow-hidden transition-colors"
+          className="w-72 shrink-0 overflow-hidden transition-colors"
           style={{ 
             boxShadow: isOverReserve ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}
@@ -506,11 +508,11 @@ export const DataTable = () => {
           onDragLeave={handleReserveDragLeave}
           onDrop={handleDropToReserve}
         >
-          <div className="bg-secondary p-6 space-y-4">
+          <div className="bg-secondary p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Icon name="Users" size={20} className="text-secondary-foreground" />
-                <h2 className="text-lg font-bold text-secondary-foreground tracking-tight">
+                <Icon name="Users" size={18} className="text-secondary-foreground" />
+                <h2 className="text-base font-bold text-secondary-foreground tracking-tight">
                   Резерв
                 </h2>
               </div>
@@ -518,9 +520,9 @@ export const DataTable = () => {
                 size="sm"
                 onClick={() => setIsAddingToReserve(true)}
                 variant="outline"
-                className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10"
+                className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10 h-7 w-7 p-0"
               >
-                <Icon name="UserPlus" size={16} />
+                <Icon name="UserPlus" size={14} />
               </Button>
             </div>
 
@@ -538,15 +540,15 @@ export const DataTable = () => {
                       setNewReserveName('');
                     }
                   }}
-                  className="flex-1 bg-secondary-foreground/10 border-secondary-foreground/20"
+                  className="flex-1 h-8 text-sm bg-secondary-foreground/10 border-secondary-foreground/20"
                   autoFocus
                 />
                 <Button
                   size="sm"
                   onClick={handleAddToReserve}
-                  className="bg-accent hover:bg-accent/90"
+                  className="bg-accent hover:bg-accent/90 h-8 w-8 p-0"
                 >
-                  <Icon name="Check" size={16} />
+                  <Icon name="Check" size={14} />
                 </Button>
                 <Button
                   size="sm"
@@ -555,20 +557,20 @@ export const DataTable = () => {
                     setIsAddingToReserve(false);
                     setNewReserveName('');
                   }}
-                  className="border-secondary-foreground/20"
+                  className="border-secondary-foreground/20 h-8 w-8 p-0"
                 >
-                  <Icon name="X" size={16} />
+                  <Icon name="X" size={14} />
                 </Button>
               </div>
             )}
           </div>
 
-          <div className="p-4 space-y-2 min-h-[400px]">
+          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
             {filteredReserve.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Icon name="UserX" size={48} className="mx-auto mb-4 opacity-20" />
-                <p className="text-sm">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
-                <p className="text-xs mt-2">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="UserX" size={32} className="mx-auto mb-3 opacity-20" />
+                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
+                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
               filteredReserve.map((item) => (
@@ -579,9 +581,9 @@ export const DataTable = () => {
                   onDragEnd={handleDragEnd}
                   className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
                 >
-                  <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-4 py-3 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-2`}>
-                    <Icon name="GripVertical" size={16} className="text-muted-foreground" />
-                    <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold`}>
+                  <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}>
+                    <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                    <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
                       {item.surname}
                     </span>
                   </div>
