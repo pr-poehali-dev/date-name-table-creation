@@ -45,6 +45,7 @@ interface SingleTableProps {
   dragOverId: string | null;
   setDragOverId: (id: string | null) => void;
   onDragEnd: () => void;
+  onDeleteToReserve: (surname: string, color: string) => void;
 }
 
 const SingleTable: React.FC<SingleTableProps> = ({ 
@@ -57,6 +58,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
   draggedId,
   dragOverId,
   setDragOverId,
+  onDeleteToReserve,
   onDragEnd
 }) => {
   const timeSlots = generateTimeSlots();
@@ -86,7 +88,11 @@ const SingleTable: React.FC<SingleTableProps> = ({
   };
 
   const handleDelete = (id: string) => {
-    onDataChange(initialData.filter(row => row.id !== id));
+    const row = initialData.find(r => r.id === id);
+    if (row && row.surname.trim()) {
+      onDeleteToReserve(row.surname, row.color);
+    }
+    onDataChange(initialData.filter(r => r.id !== id));
   };
 
   const handleAdd = () => {
@@ -463,6 +469,11 @@ export const DataTable = () => {
     setIsAddingToReserve(false);
   };
 
+  const handleDeleteToReserve = (surname: string, color: string) => {
+    const newId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
+    setReserve([...reserve, { id: newId, surname, color }]);
+  };
+
   const filteredReserve = reserve.filter(item => 
     item.surname.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -517,6 +528,7 @@ export const DataTable = () => {
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
           onDragEnd={handleDragEnd}
+          onDeleteToReserve={handleDeleteToReserve}
         />
 
         <SingleTable 
@@ -530,6 +542,7 @@ export const DataTable = () => {
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
           onDragEnd={handleDragEnd}
+          onDeleteToReserve={handleDeleteToReserve}
         />
 
         <Card 
