@@ -48,7 +48,7 @@ interface SingleTableProps {
   dragOverId: string | null;
   setDragOverId: (id: string | null) => void;
   onDragEnd: () => void;
-  onDeleteToReserve: (surname: string, color: string) => void;
+  onDeleteToReserve: (surname: string, color: string, surname2?: string, color2?: string) => void;
 }
 
 const SingleTable: React.FC<SingleTableProps> = ({ 
@@ -99,8 +99,8 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const handleDelete = (id: string) => {
     const row = initialData.find(r => r.id === id);
     if (row && row.surname.trim()) {
-      onDeleteToReserve(row.surname, row.color);
-      onDataChange(initialData.map(r => r.id === id ? { ...r, surname: '', color: 'blue' } : r));
+      onDeleteToReserve(row.surname, row.color, row.surname2, row.color2);
+      onDataChange(initialData.map(r => r.id === id ? { ...r, surname: '', color: 'blue', surname2: '', color2: 'green' } : r));
     }
   };
 
@@ -472,9 +472,10 @@ export const DataTable = () => {
     return generated;
   });
   
-  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string}>>([
+  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; surname2?: string; color2?: string; linkedId?: string}>>([
     { id: 'r1', surname: 'Алексеев', color: 'purple' },
-    { id: 'r2', surname: 'Новиков', color: 'pink' },
+    { id: 'r2', surname: 'Новиков', color: 'pink', surname2: 'Морозов', color2: 'green', linkedId: 'r3' },
+    { id: 'r3', surname: 'Морозов', color: 'green', linkedId: 'r2' },
   ]);
 
   const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string}>>([]);
@@ -527,18 +528,31 @@ export const DataTable = () => {
 
     const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
     if (draggedRow) {
+      const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
+      
       if (draggedFromSecond && draggedRow.surname2) {
-        const newReserveId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
+        const newReserveId = `r${maxId + 1}`;
         setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green' }]);
         
         setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
         setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
       } else if (draggedRow.surname) {
-        const newReserveId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
-        setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color }]);
+        if (draggedRow.surname2) {
+          const newReserveId1 = `r${maxId + 1}`;
+          const newReserveId2 = `r${maxId + 2}`;
+          
+          setReserve([
+            ...reserve, 
+            { id: newReserveId1, surname: draggedRow.surname, color: draggedRow.color, surname2: draggedRow.surname2, color2: draggedRow.color2, linkedId: newReserveId2 },
+            { id: newReserveId2, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', linkedId: newReserveId1 }
+          ]);
+        } else {
+          const newReserveId = `r${maxId + 1}`;
+          setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color }]);
+        }
         
-        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
-        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '', surname2: '', color2: 'green' } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '', surname2: '', color2: 'green' } : row));
       }
     }
 
@@ -631,9 +645,21 @@ export const DataTable = () => {
     setIsAddingToWeekend(false);
   };
 
-  const handleDeleteToReserve = (surname: string, color: string) => {
-    const newId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
-    setReserve([...reserve, { id: newId, surname, color }]);
+  const handleDeleteToReserve = (surname: string, color: string, surname2?: string, color2?: string) => {
+    const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
+    
+    if (surname2) {
+      const newId1 = `r${maxId + 1}`;
+      const newId2 = `r${maxId + 2}`;
+      setReserve([
+        ...reserve, 
+        { id: newId1, surname, color, surname2, color2, linkedId: newId2 },
+        { id: newId2, surname: surname2, color: color2 || 'green', linkedId: newId1 }
+      ]);
+    } else {
+      const newId = `r${maxId + 1}`;
+      setReserve([...reserve, { id: newId, surname, color }]);
+    }
   };
 
   const filteredReserve = reserve.filter(item => 
@@ -664,14 +690,38 @@ export const DataTable = () => {
     if (!draggedId) return;
 
     if (draggedFromReserve && draggedItem) {
-      setDataSet(dataSet.map(row => 
-        row.id === targetId 
-          ? toSecondCell 
-            ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
-            : { ...row, surname: draggedItem.surname, color: draggedItem.color }
-          : row
-      ));
-      setReserve(reserve.filter(r => r.id !== draggedId));
+      const draggedReserveItem = reserve.find(r => r.id === draggedId);
+      
+      if (draggedReserveItem?.linkedId) {
+        const linkedItem = reserve.find(r => r.id === draggedReserveItem.linkedId);
+        
+        if (linkedItem) {
+          setDataSet(dataSet.map(row => 
+            row.id === targetId 
+              ? { ...row, surname: draggedItem.surname, color: draggedItem.color, surname2: linkedItem.surname, color2: linkedItem.color }
+              : row
+          ));
+          setReserve(reserve.filter(r => r.id !== draggedId && r.id !== draggedReserveItem.linkedId));
+        } else {
+          setDataSet(dataSet.map(row => 
+            row.id === targetId 
+              ? toSecondCell 
+                ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
+                : { ...row, surname: draggedItem.surname, color: draggedItem.color }
+              : row
+          ));
+          setReserve(reserve.filter(r => r.id !== draggedId));
+        }
+      } else {
+        setDataSet(dataSet.map(row => 
+          row.id === targetId 
+            ? toSecondCell 
+              ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
+              : { ...row, surname: draggedItem.surname, color: draggedItem.color }
+            : row
+        ));
+        setReserve(reserve.filter(r => r.id !== draggedId));
+      }
     }
 
     if (draggedFromWeekend && draggedItem) {
@@ -818,11 +868,20 @@ export const DataTable = () => {
                   onDragEnd={handleDragEnd}
                   className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
                 >
-                  <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}>
-                    <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                    <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
-                      {item.surname}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1`}>
+                      <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                      <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                        {item.surname}
+                      </span>
+                    </div>
+                    {item.surname2 && (
+                      <div className={`border-2 ${colorOptions.find(c => c.value === item.color2)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color2)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
+                        <span className={`${colorOptions.find(c => c.value === item.color2)?.text} font-semibold text-sm`}>
+                          {item.surname2}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))
