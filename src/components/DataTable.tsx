@@ -11,6 +11,8 @@ interface TableRow {
   time: string;
   surname: string;
   color: string;
+  surname2?: string;
+  color2?: string;
 }
 
 const colorOptions = [
@@ -62,10 +64,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
   onDragEnd
 }) => {
   const timeSlots = generateTimeSlots();
-  const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' } | null>(null);
+  const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2' } | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color', currentValue: string) => {
+  const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2', currentValue: string) => {
     setEditingCell({ id, field });
     setEditValue(currentValue);
   };
@@ -73,11 +75,15 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const handleSave = () => {
     if (!editingCell) return;
     
-    onDataChange(initialData.map(row => 
-      row.id === editingCell.id 
-        ? { ...row, [editingCell.field]: editValue }
-        : row
-    ));
+    onDataChange(initialData.map(row => {
+      if (row.id === editingCell.id) {
+        if (editingCell.field === 'surname2' && editValue && !row.color2) {
+          return { ...row, [editingCell.field]: editValue, color2: 'green' };
+        }
+        return { ...row, [editingCell.field]: editValue };
+      }
+      return row;
+    }));
     setEditingCell(null);
     setEditValue('');
   };
@@ -122,7 +128,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
       newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
     }
     
-    onDataChange([...initialData, { id: newId, date: newDate, time: newTime, surname: '', color: 'red' }]);
+    onDataChange([...initialData, { id: newId, date: newDate, time: newTime, surname: '', color: 'red', surname2: '', color2: 'green' }]);
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
@@ -264,17 +270,39 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           className="max-w-xs text-sm"
                           autoFocus
                         />
+                      ) : editingCell?.id === row.id && editingCell.field === 'surname2' ? (
+                        <Input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSave();
+                            if (e.key === 'Escape') handleCancel();
+                          }}
+                          className="max-w-xs text-sm"
+                          autoFocus
+                        />
                       ) : (
-                        <div 
-                          draggable={!editingCell}
-                          onDragStart={(e) => handleDragStart(e, row.id)}
-                          onDragEnd={onDragEnd}
-                          onClick={() => handleEdit(row.id, 'surname', row.surname)}
-                          className="cursor-move transition-colors font-medium flex items-center gap-1"
-                        >
-                          <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                          <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
-                            <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
+                        <div className="flex items-center gap-2">
+                          <div 
+                            draggable={!editingCell}
+                            onDragStart={(e) => handleDragStart(e, row.id)}
+                            onDragEnd={onDragEnd}
+                            onClick={() => handleEdit(row.id, 'surname', row.surname)}
+                            className="cursor-move transition-colors font-medium flex items-center gap-1"
+                          >
+                            <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                            <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
+                              <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
+                            </div>
+                          </div>
+                          <div 
+                            onClick={() => handleEdit(row.id, 'surname2', row.surname2 || '')}
+                            className="cursor-pointer transition-colors font-medium flex items-center gap-1"
+                          >
+                            <div className={`border-2 ${row.surname2 ? colorOptions.find(c => c.value === row.color2)?.border : 'border-dashed border-gray-300'} rounded-lg px-3 py-1 ${row.surname2 ? colorOptions.find(c => c.value === row.color2)?.bg : 'bg-gray-50'} hover:bg-gray-100 transition-colors shadow-sm`}>
+                              <span className={`${row.surname2 ? colorOptions.find(c => c.value === row.color2)?.text : 'text-gray-400'} font-semibold text-sm`}>{row.surname2 || '+'}</span>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -366,7 +394,9 @@ const generateThreeDaysData = (startDate: string, tablePrefix: string) => {
           date: dateString,
           time: time,
           surname: '',
-          color: 'blue'
+          color: 'blue',
+          surname2: '',
+          color2: 'green'
         });
       }
     }
@@ -380,9 +410,9 @@ export const DataTable = () => {
   
   const [data1, setData1] = useState<TableRow[]>(() => {
     const generated = generateThreeDaysData(today, 't1');
-    generated[0] = { ...generated[0], surname: 'Иванов', color: 'red' };
-    generated[1] = { ...generated[1], surname: 'Петров', color: 'blue' };
-    generated[2] = { ...generated[2], surname: 'Сидоров', color: 'green' };
+    generated[0] = { ...generated[0], surname: 'Иванов', color: 'red', surname2: 'Петров', color2: 'blue' };
+    generated[1] = { ...generated[1], surname: 'Петров', color: 'blue', surname2: '', color2: 'green' };
+    generated[2] = { ...generated[2], surname: 'Сидоров', color: 'green', surname2: '', color2: 'green' };
     return generated;
   });
 
