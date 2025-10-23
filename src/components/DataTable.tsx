@@ -34,31 +34,34 @@ const generateTimeSlots = () => {
   return slots;
 };
 
-export const DataTable = () => {
+interface SingleTableProps {
+  title: string;
+  initialData: TableRow[];
+  onDataChange: (data: TableRow[]) => void;
+  searchQuery: string;
+  onDragFromTable: (item: {surname: string; color: string}, id: string) => void;
+  onDropToTable: (targetId: string, item: {surname: string; color: string} | null, fromReserve: boolean, draggedId: string | null) => void;
+  draggedId: string | null;
+  dragOverId: string | null;
+  setDragOverId: (id: string | null) => void;
+  onDragEnd: () => void;
+}
+
+const SingleTable: React.FC<SingleTableProps> = ({ 
+  title, 
+  initialData, 
+  onDataChange, 
+  searchQuery,
+  onDragFromTable,
+  onDropToTable,
+  draggedId,
+  dragOverId,
+  setDragOverId,
+  onDragEnd
+}) => {
   const timeSlots = generateTimeSlots();
-  
-  const [data, setData] = useState<TableRow[]>([
-    { id: '1', date: '2025-01-20', time: '09:00', surname: 'Иванов', color: 'red' },
-    { id: '2', date: '2025-01-20', time: '09:15', surname: 'Петров', color: 'blue' },
-    { id: '3', date: '2025-01-20', time: '09:30', surname: 'Сидоров', color: 'green' },
-  ]);
-  
-  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string}>>([
-    { id: 'r1', surname: 'Алексеев', color: 'purple' },
-    { id: 'r2', surname: 'Новиков', color: 'pink' },
-  ]);
-  
-  const [draggedFromReserve, setDraggedFromReserve] = useState(false);
-  const [isOverReserve, setIsOverReserve] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [newReserveName, setNewReserveName] = useState('');
-  const [isAddingToReserve, setIsAddingToReserve] = useState(false);
-  
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' } | null>(null);
   const [editValue, setEditValue] = useState('');
-  const [draggedId, setDraggedId] = useState<string | null>(null);
-  const [dragOverId, setDragOverId] = useState<string | null>(null);
-  const [draggedItem, setDraggedItem] = useState<{surname: string; color: string} | null>(null);
 
   const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color', currentValue: string) => {
     setEditingCell({ id, field });
@@ -68,7 +71,7 @@ export const DataTable = () => {
   const handleSave = () => {
     if (!editingCell) return;
     
-    setData(data.map(row => 
+    onDataChange(initialData.map(row => 
       row.id === editingCell.id 
         ? { ...row, [editingCell.field]: editValue }
         : row
@@ -83,17 +86,17 @@ export const DataTable = () => {
   };
 
   const handleDelete = (id: string) => {
-    setData(data.filter(row => row.id !== id));
+    onDataChange(initialData.filter(row => row.id !== id));
   };
 
   const handleAdd = () => {
-    const newId = (Math.max(...data.map(r => parseInt(r.id)), 0) + 1).toString();
+    const newId = (Math.max(...initialData.map(r => parseInt(r.id)), 0) + 1).toString();
     
     let newTime = '09:00';
     let newDate = new Date().toISOString().split('T')[0];
     
-    if (data.length > 0) {
-      const lastRow = data[data.length - 1];
+    if (initialData.length > 0) {
+      const lastRow = initialData[initialData.length - 1];
       const lastTime = lastRow.time;
       const [hours, minutes] = lastTime.split(':').map(Number);
       let totalMinutes = hours * 60 + minutes + 15;
@@ -112,18 +115,257 @@ export const DataTable = () => {
       newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
     }
     
-    setData([...data, { id: newId, date: newDate, time: newTime, surname: '', color: 'red' }]);
+    onDataChange([...initialData, { id: newId, date: newDate, time: newTime, surname: '', color: 'red' }]);
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
-    const row = data.find(r => r.id === id);
+    const row = initialData.find(r => r.id === id);
     if (row) {
-      setDraggedItem({ surname: row.surname, color: row.color });
-      setDraggedId(id);
-      setDraggedFromReserve(false);
+      onDragFromTable({ surname: row.surname, color: row.color }, id);
     }
     e.dataTransfer.effectAllowed = 'move';
   };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverId(id);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverId(null);
+  };
+
+  const filteredData = initialData.filter(row => 
+    row.surname.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Card className="flex-1 overflow-hidden">
+      <div className="bg-primary p-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-primary-foreground tracking-tight">
+            {title}
+          </h1>
+          <Button 
+            onClick={handleAdd}
+            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          >
+            <Icon name="Plus" size={16} className="mr-2" />
+            Добавить запись
+          </Button>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-secondary border-b border-border">
+              <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
+                Время
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
+                Фамилия
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
+                Цвет
+              </th>
+              <th className="px-6 py-4 text-center text-sm font-semibold text-secondary-foreground uppercase tracking-wider w-32">
+                Действия
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-card divide-y divide-border">
+            {(searchQuery ? filteredData : initialData).map((row, index, array) => {
+              const isNewDay = index === 0 || array[index - 1].date !== row.date;
+              
+              return (
+                <React.Fragment key={`fragment-${row.id}`}>
+                  {isNewDay && (
+                    <tr key={`date-${row.date}-${index}`}>
+                      <td colSpan={4} className="bg-secondary/50 px-6 py-3">
+                        <div className="flex items-center gap-2">
+                          <Icon name="Calendar" size={18} className="text-secondary-foreground" />
+                          <span className="font-semibold text-secondary-foreground">
+                            {new Date(row.date).toLocaleDateString('ru-RU', { 
+                              weekday: 'long', 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  <tr 
+                    key={`row-${row.id}`} 
+                    className={`transition-colors ${
+                      dragOverId === row.id ? 'bg-accent/20' : 'hover:bg-muted/50'
+                    } ${draggedId === row.id ? 'opacity-50' : ''}`}
+                    onDragOver={(e) => handleDragOver(e, row.id)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggedId) {
+                        const draggedRow = initialData.find(r => r.id === draggedId);
+                        if (draggedRow && draggedId !== row.id) {
+                          onDataChange(initialData.map(r => {
+                            if (r.id === draggedId) {
+                              return { ...r, date: row.date, time: row.time };
+                            }
+                            return r;
+                          }));
+                        }
+                      }
+                      onDragEnd();
+                    }}
+                  >
+                    <td className="px-6 py-4">
+                      {editingCell?.id === row.id && editingCell.field === 'time' ? (
+                        <Select value={editValue} onValueChange={setEditValue}>
+                          <SelectTrigger className="max-w-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timeSlots.map(slot => (
+                              <SelectItem key={slot} value={slot}>
+                                {slot}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div 
+                          onClick={() => handleEdit(row.id, 'time', row.time)}
+                          className="cursor-pointer text-foreground hover:text-accent transition-colors font-mono"
+                        >
+                          {row.time}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {editingCell?.id === row.id && editingCell.field === 'surname' ? (
+                        <Input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSave();
+                            if (e.key === 'Escape') handleCancel();
+                          }}
+                          className="max-w-xs"
+                          autoFocus
+                        />
+                      ) : (
+                        <div 
+                          draggable={!editingCell}
+                          onDragStart={(e) => handleDragStart(e, row.id)}
+                          onDragEnd={onDragEnd}
+                          onClick={() => handleEdit(row.id, 'surname', row.surname)}
+                          className="cursor-move transition-colors font-medium flex items-center gap-2"
+                        >
+                          <Icon name="GripVertical" size={16} className="text-muted-foreground" />
+                          <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-4 py-2 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
+                            <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold`}>{row.surname || '—'}</span>
+                          </div>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {editingCell?.id === row.id && editingCell.field === 'color' ? (
+                        <Select value={editValue} onValueChange={setEditValue}>
+                          <SelectTrigger className="max-w-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {colorOptions.map(color => (
+                              <SelectItem key={color.value} value={color.value}>
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-4 h-4 rounded ${color.bg} border-2 ${color.border}`}></div>
+                                  {color.label}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div 
+                          onClick={() => handleEdit(row.id, 'color', row.color)}
+                          className="cursor-pointer flex items-center gap-2"
+                        >
+                          <div className={`w-6 h-6 rounded border-2 ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
+                          <span className="text-sm text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        {editingCell?.id === row.id ? (
+                          <>
+                            <Button
+                              size="sm"
+                              onClick={handleSave}
+                              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                            >
+                              <Icon name="Check" size={16} />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleCancel}
+                            >
+                              <Icon name="X" size={16} />
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDelete(row.id)}
+                          >
+                            <Icon name="Trash2" size={16} />
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+};
+
+export const DataTable = () => {
+  const [data1, setData1] = useState<TableRow[]>([
+    { id: '1', date: '2025-01-20', time: '09:00', surname: 'Иванов', color: 'red' },
+    { id: '2', date: '2025-01-20', time: '09:15', surname: 'Петров', color: 'blue' },
+    { id: '3', date: '2025-01-20', time: '09:30', surname: 'Сидоров', color: 'green' },
+  ]);
+
+  const [data2, setData2] = useState<TableRow[]>([
+    { id: '1', date: '2025-01-21', time: '10:00', surname: 'Кузнецов', color: 'yellow' },
+    { id: '2', date: '2025-01-21', time: '10:15', surname: 'Смирнов', color: 'purple' },
+  ]);
+  
+  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string}>>([
+    { id: 'r1', surname: 'Алексеев', color: 'purple' },
+    { id: 'r2', surname: 'Новиков', color: 'pink' },
+  ]);
+  
+  const [draggedFromReserve, setDraggedFromReserve] = useState(false);
+  const [isOverReserve, setIsOverReserve] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [newReserveName, setNewReserveName] = useState('');
+  const [isAddingToReserve, setIsAddingToReserve] = useState(false);
+  
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [draggedItem, setDraggedItem] = useState<{surname: string; color: string} | null>(null);
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);
@@ -133,12 +375,6 @@ export const DataTable = () => {
       setDraggedFromReserve(true);
     }
     e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent, id: string) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setDragOverId(id);
   };
 
   const handleReserveDragOver = (e: React.DragEvent) => {
@@ -151,10 +387,6 @@ export const DataTable = () => {
     setIsOverReserve(false);
   };
 
-  const handleDragLeave = () => {
-    setDragOverId(null);
-  };
-
   const handleDropToReserve = (e: React.DragEvent) => {
     e.preventDefault();
     
@@ -165,58 +397,18 @@ export const DataTable = () => {
       return;
     }
 
-    const draggedRow = data.find(row => row.id === draggedId);
+    const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
     if (draggedRow && draggedRow.surname) {
       const newReserveId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
       setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color }]);
-      setData(data.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+      
+      setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+      setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
     }
 
     setDraggedId(null);
     setDraggedItem(null);
     setIsOverReserve(false);
-  };
-
-  const handleDrop = (e: React.DragEvent, targetId: string) => {
-    e.preventDefault();
-    
-    if (!draggedId) {
-      setDragOverId(null);
-      return;
-    }
-
-    if (draggedFromReserve && draggedItem) {
-      setData(data.map(row => 
-        row.id === targetId 
-          ? { ...row, surname: draggedItem.surname, color: draggedItem.color }
-          : row
-      ));
-      setReserve(reserve.filter(r => r.id !== draggedId));
-    } else {
-      if (draggedId === targetId) {
-        setDraggedId(null);
-        setDragOverId(null);
-        setDraggedItem(null);
-        return;
-      }
-
-      const draggedRow = data.find(row => row.id === draggedId);
-      const targetRow = data.find(row => row.id === targetId);
-
-      if (draggedRow && targetRow) {
-        setData(data.map(row => {
-          if (row.id === draggedId) {
-            return { ...row, date: targetRow.date, time: targetRow.time };
-          }
-          return row;
-        }));
-      }
-    }
-
-    setDraggedId(null);
-    setDragOverId(null);
-    setDraggedItem(null);
-    setDraggedFromReserve(false);
   };
 
   const handleDragEnd = () => {
@@ -240,27 +432,32 @@ export const DataTable = () => {
     item.surname.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredData = data.filter(row => 
-    row.surname.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleDragFromTable = (item: {surname: string; color: string}, id: string) => {
+    setDraggedItem(item);
+    setDraggedId(id);
+    setDraggedFromReserve(false);
+  };
+
+  const handleDropToTable = (dataSet: TableRow[], setDataSet: (data: TableRow[]) => void, targetId: string) => {
+    if (!draggedId) return;
+
+    if (draggedFromReserve && draggedItem) {
+      setDataSet(dataSet.map(row => 
+        row.id === targetId 
+          ? { ...row, surname: draggedItem.surname, color: draggedItem.color }
+          : row
+      ));
+      setReserve(reserve.filter(r => r.id !== draggedId));
+    }
+
+    handleDragEnd();
+  };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 flex gap-6">
-      <Card className="flex-1 overflow-hidden">
-        <div className="bg-primary p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-primary-foreground tracking-tight">
-              DATA DASHBOARD
-            </h1>
-            <Button 
-              onClick={handleAdd}
-              className="bg-accent hover:bg-accent/90 text-accent-foreground"
-            >
-              <Icon name="Plus" size={16} className="mr-2" />
-              Добавить запись
-            </Button>
-          </div>
-          <div className="relative">
+    <div className="w-full min-h-screen bg-background p-6">
+      <div className="max-w-[1800px] mx-auto mb-6">
+        <div className="bg-primary p-6 rounded-lg">
+          <div className="relative max-w-md">
             <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-foreground/60" />
             <Input
               type="text"
@@ -271,285 +468,131 @@ export const DataTable = () => {
             />
           </div>
         </div>
+      </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-secondary border-b border-border">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
-                  Время
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
-                  Фамилия
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-secondary-foreground uppercase tracking-wider">
-                  Цвет
-                </th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-secondary-foreground uppercase tracking-wider w-32">
-                  Действия
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-card divide-y divide-border">
-              {(searchQuery ? filteredData : data).map((row, index, array) => {
-                const isNewDay = index === 0 || array[index - 1].date !== row.date;
-                
-                return (
-                  <React.Fragment key={`fragment-${row.id}`}>
-                    {isNewDay && (
-                      <tr key={`date-${row.date}-${index}`}>
-                        <td colSpan={4} className="bg-secondary/50 px-6 py-3">
-                          <div className="flex items-center gap-2">
-                            <Icon name="Calendar" size={18} className="text-secondary-foreground" />
-                            <span className="font-semibold text-secondary-foreground">
-                              {new Date(row.date).toLocaleDateString('ru-RU', { 
-                                weekday: 'long', 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
-                              })}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                    <tr 
-                      key={`row-${row.id}`} 
-                      className={`transition-colors ${
-                        dragOverId === row.id ? 'bg-accent/20' : 'hover:bg-muted/50'
-                      } ${draggedId === row.id ? 'opacity-50' : ''}`}
-                      onDragOver={(e) => handleDragOver(e, row.id)}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, row.id)}
-                    >
-                      <td className="px-6 py-4">
-                    {editingCell?.id === row.id && editingCell.field === 'time' ? (
-                      <Select value={editValue} onValueChange={setEditValue}>
-                        <SelectTrigger className="max-w-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timeSlots.map(slot => (
-                            <SelectItem key={slot} value={slot}>
-                              {slot}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div 
-                        onClick={() => handleEdit(row.id, 'time', row.time)}
-                        className="cursor-pointer text-foreground hover:text-accent transition-colors font-mono"
-                      >
-                        {row.time}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    {editingCell?.id === row.id && editingCell.field === 'surname' ? (
-                      <Input
-                        type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleSave();
-                          if (e.key === 'Escape') handleCancel();
-                        }}
-                        className="max-w-xs"
-                        autoFocus
-                      />
-                    ) : (
-                      <div 
-                        draggable={!editingCell}
-                        onDragStart={(e) => handleDragStart(e, row.id)}
-                        onDragEnd={handleDragEnd}
-                        onClick={() => handleEdit(row.id, 'surname', row.surname)}
-                        className="cursor-move transition-colors font-medium flex items-center gap-2"
-                      >
-                        <Icon name="GripVertical" size={16} className="text-muted-foreground" />
-                        <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-4 py-2 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
-                          <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold`}>{row.surname || '—'}</span>
-                        </div>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    {editingCell?.id === row.id && editingCell.field === 'color' ? (
-                      <Select value={editValue} onValueChange={setEditValue}>
-                        <SelectTrigger className="max-w-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {colorOptions.map(color => (
-                            <SelectItem key={color.value} value={color.value}>
-                              <div className="flex items-center gap-2">
-                                <div className={`w-4 h-4 rounded ${color.bg} border-2 ${color.border}`}></div>
-                                {color.label}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div 
-                        onClick={() => handleEdit(row.id, 'color', row.color)}
-                        className="cursor-pointer flex items-center gap-2"
-                      >
-                        <div className={`w-6 h-6 rounded border-2 ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
-                        <span className="text-sm text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      {editingCell?.id === row.id ? (
-                        <>
-                          <Button
-                            size="sm"
-                            onClick={handleSave}
-                            className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                          >
-                            <Icon name="Check" size={16} />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={handleCancel}
-                          >
-                            <Icon name="X" size={16} />
-                          </Button>
-                        </>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(row.id)}
-                          className="hover:bg-destructive hover:text-destructive-foreground"
-                        >
-                          <Icon name="Trash2" size={16} />
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      <div className="max-w-[1800px] mx-auto flex gap-6">
+        <SingleTable 
+          title="ТАБЛИЦА 1"
+          initialData={data1}
+          onDataChange={setData1}
+          searchQuery={searchQuery}
+          onDragFromTable={handleDragFromTable}
+          onDropToTable={(targetId) => handleDropToTable(data1, setData1, targetId)}
+          draggedId={draggedId}
+          dragOverId={dragOverId}
+          setDragOverId={setDragOverId}
+          onDragEnd={handleDragEnd}
+        />
 
-        {data.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <Icon name="Database" size={48} className="mx-auto mb-4 opacity-20" />
-            <p className="text-lg">Нет данных для отображения</p>
-            <p className="text-sm mt-2">Нажмите "Добавить запись" чтобы начать</p>
-          </div>
-        )}
+        <SingleTable 
+          title="ТАБЛИЦА 2"
+          initialData={data2}
+          onDataChange={setData2}
+          searchQuery={searchQuery}
+          onDragFromTable={handleDragFromTable}
+          onDropToTable={(targetId) => handleDropToTable(data2, setData2, targetId)}
+          draggedId={draggedId}
+          dragOverId={dragOverId}
+          setDragOverId={setDragOverId}
+          onDragEnd={handleDragEnd}
+        />
 
-        <div className="bg-muted px-6 py-4 border-t border-border">
-          <p className="text-sm text-muted-foreground">
-            Всего записей: <span className="font-semibold text-foreground">{data.length}</span>
-          </p>
-        </div>
-      </Card>
-
-      <Card 
-        className={`w-80 overflow-hidden transition-colors ${isOverReserve ? 'ring-2 ring-accent' : ''}`}
-        onDragOver={handleReserveDragOver}
-        onDragLeave={handleReserveDragLeave}
-        onDrop={handleDropToReserve}
-      >
-        <div className="bg-secondary p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Icon name="Users" size={20} className="text-secondary-foreground" />
-              <h2 className="text-lg font-bold text-secondary-foreground tracking-tight">
-                Резерв
-              </h2>
+        <Card 
+          className="w-80 shrink-0 overflow-hidden transition-colors"
+          style={{ 
+            boxShadow: isOverReserve ? '0 0 0 3px hsl(var(--accent))' : undefined,
+          }}
+          onDragOver={handleReserveDragOver}
+          onDragLeave={handleReserveDragLeave}
+          onDrop={handleDropToReserve}
+        >
+          <div className="bg-secondary p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon name="Users" size={20} className="text-secondary-foreground" />
+                <h2 className="text-lg font-bold text-secondary-foreground tracking-tight">
+                  Резерв
+                </h2>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setIsAddingToReserve(true)}
+                variant="outline"
+                className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10"
+              >
+                <Icon name="UserPlus" size={16} />
+              </Button>
             </div>
-            <Button
-              size="sm"
-              onClick={() => setIsAddingToReserve(true)}
-              variant="outline"
-              className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10"
-            >
-              <Icon name="UserPlus" size={16} />
-            </Button>
-          </div>
 
-          {isAddingToReserve && (
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Введите фамилию..."
-                value={newReserveName}
-                onChange={(e) => setNewReserveName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAddToReserve();
-                  if (e.key === 'Escape') {
+            {isAddingToReserve && (
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Введите фамилию..."
+                  value={newReserveName}
+                  onChange={(e) => setNewReserveName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddToReserve();
+                    if (e.key === 'Escape') {
+                      setIsAddingToReserve(false);
+                      setNewReserveName('');
+                    }
+                  }}
+                  className="flex-1 bg-secondary-foreground/10 border-secondary-foreground/20"
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAddToReserve}
+                  className="bg-accent hover:bg-accent/90"
+                >
+                  <Icon name="Check" size={16} />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
                     setIsAddingToReserve(false);
                     setNewReserveName('');
-                  }
-                }}
-                className="flex-1 bg-secondary-foreground/10 border-secondary-foreground/20"
-                autoFocus
-              />
-              <Button
-                size="sm"
-                onClick={handleAddToReserve}
-                className="bg-accent hover:bg-accent/90"
-              >
-                <Icon name="Check" size={16} />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setIsAddingToReserve(false);
-                  setNewReserveName('');
-                }}
-                className="border-secondary-foreground/20"
-              >
-                <Icon name="X" size={16} />
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className="p-4 space-y-2 min-h-[400px]">
-          {filteredReserve.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Icon name="UserX" size={48} className="mx-auto mb-4 opacity-20" />
-              <p className="text-sm">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
-              <p className="text-xs mt-2">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
-            </div>
-          ) : (
-            filteredReserve.map((item) => (
-              <div
-                key={item.id}
-                draggable
-                onDragStart={(e) => handleReserveDragStart(e, item.id)}
-                onDragEnd={handleDragEnd}
-                className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
-              >
-                <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-4 py-3 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-2`}>
-                  <Icon name="GripVertical" size={16} className="text-muted-foreground" />
-                  <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold`}>
-                    {item.surname}
-                  </span>
-                </div>
+                  }}
+                  className="border-secondary-foreground/20"
+                >
+                  <Icon name="X" size={16} />
+                </Button>
               </div>
-            ))
-          )}
-        </div>
+            )}
+          </div>
 
-        <div className="bg-muted px-6 py-4 border-t border-border">
-          <p className="text-sm text-muted-foreground">
-            В резерве: <span className="font-semibold text-foreground">{reserve.length}</span>
-          </p>
-        </div>
-      </Card>
+          <div className="p-4 space-y-2 min-h-[400px]">
+            {filteredReserve.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Icon name="UserX" size={48} className="mx-auto mb-4 opacity-20" />
+                <p className="text-sm">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
+                <p className="text-xs mt-2">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              </div>
+            ) : (
+              filteredReserve.map((item) => (
+                <div
+                  key={item.id}
+                  draggable
+                  onDragStart={(e) => handleReserveDragStart(e, item.id)}
+                  onDragEnd={handleDragEnd}
+                  className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                >
+                  <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-4 py-3 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-2`}>
+                    <Icon name="GripVertical" size={16} className="text-muted-foreground" />
+                    <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold`}>
+                      {item.surname}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
+
+export default DataTable;
