@@ -97,6 +97,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
     
     if (initialData.length > 0) {
       const lastRow = initialData[initialData.length - 1];
+      newDate = lastRow.date;
       const lastTime = lastRow.time;
       const [hours, minutes] = lastTime.split(':').map(Number);
       let totalMinutes = hours * 60 + minutes + 15;
@@ -342,17 +343,49 @@ const SingleTable: React.FC<SingleTableProps> = ({
   );
 };
 
-export const DataTable = () => {
-  const [data1, setData1] = useState<TableRow[]>([
-    { id: 't1-1', date: '2025-01-20', time: '09:00', surname: 'Иванов', color: 'red' },
-    { id: 't1-2', date: '2025-01-20', time: '09:15', surname: 'Петров', color: 'blue' },
-    { id: 't1-3', date: '2025-01-20', time: '09:30', surname: 'Сидоров', color: 'green' },
-  ]);
+const generateThreeDaysData = (startDate: string, tablePrefix: string) => {
+  const rows: TableRow[] = [];
+  let id = 1;
+  
+  for (let day = 0; day < 3; day++) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + day);
+    const dateString = date.toISOString().split('T')[0];
+    
+    for (let hour = 9; hour < 18; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        rows.push({
+          id: `${tablePrefix}-${id++}`,
+          date: dateString,
+          time: time,
+          surname: '',
+          color: 'blue'
+        });
+      }
+    }
+  }
+  
+  return rows;
+};
 
-  const [data2, setData2] = useState<TableRow[]>([
-    { id: 't2-1', date: '2025-01-21', time: '10:00', surname: 'Кузнецов', color: 'yellow' },
-    { id: 't2-2', date: '2025-01-21', time: '10:15', surname: 'Смирнов', color: 'purple' },
-  ]);
+export const DataTable = () => {
+  const today = new Date().toISOString().split('T')[0];
+  
+  const [data1, setData1] = useState<TableRow[]>(() => {
+    const generated = generateThreeDaysData(today, 't1');
+    generated[0] = { ...generated[0], surname: 'Иванов', color: 'red' };
+    generated[1] = { ...generated[1], surname: 'Петров', color: 'blue' };
+    generated[2] = { ...generated[2], surname: 'Сидоров', color: 'green' };
+    return generated;
+  });
+
+  const [data2, setData2] = useState<TableRow[]>(() => {
+    const generated = generateThreeDaysData(today, 't2');
+    generated[0] = { ...generated[0], surname: 'Кузнецов', color: 'yellow' };
+    generated[1] = { ...generated[1], surname: 'Смирнов', color: 'purple' };
+    return generated;
+  });
   
   const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string}>>([
     { id: 'r1', surname: 'Алексеев', color: 'purple' },
