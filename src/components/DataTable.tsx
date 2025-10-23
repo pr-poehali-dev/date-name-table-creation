@@ -472,9 +472,9 @@ export const DataTable = () => {
     return generated;
   });
   
-  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; surname2?: string; color2?: string; linkedId?: string}>>([
+  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string}>>([
     { id: 'r1', surname: 'Алексеев', color: 'purple' },
-    { id: 'r2', surname: 'Новиков', color: 'pink', surname2: 'Морозов', color2: 'green', linkedId: 'r3' },
+    { id: 'r2', surname: 'Новиков', color: 'pink', linkedId: 'r3' },
     { id: 'r3', surname: 'Морозов', color: 'green', linkedId: 'r2' },
   ]);
 
@@ -543,7 +543,7 @@ export const DataTable = () => {
           
           setReserve([
             ...reserve, 
-            { id: newReserveId1, surname: draggedRow.surname, color: draggedRow.color, surname2: draggedRow.surname2, color2: draggedRow.color2, linkedId: newReserveId2 },
+            { id: newReserveId1, surname: draggedRow.surname, color: draggedRow.color, linkedId: newReserveId2 },
             { id: newReserveId2, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', linkedId: newReserveId1 }
           ]);
         } else {
@@ -653,7 +653,7 @@ export const DataTable = () => {
       const newId2 = `r${maxId + 2}`;
       setReserve([
         ...reserve, 
-        { id: newId1, surname, color, surname2, color2, linkedId: newId2 },
+        { id: newId1, surname, color, linkedId: newId2 },
         { id: newId2, surname: surname2, color: color2 || 'green', linkedId: newId1 }
       ]);
     } else {
@@ -667,7 +667,7 @@ export const DataTable = () => {
     if (item?.linkedId) {
       setReserve(reserve.map(r => {
         if (r.id === id || r.id === item.linkedId) {
-          const { linkedId, surname2, color2, ...rest } = r;
+          const { linkedId, ...rest } = r;
           return rest;
         }
         return r;
@@ -873,45 +873,48 @@ export const DataTable = () => {
                 <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
-              filteredReserve.map((item) => (
-                <div
-                  key={item.id}
-                  draggable
-                  onDragStart={(e) => handleReserveDragStart(e, item.id)}
-                  onDragEnd={handleDragEnd}
-                  className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1`}>
-                      <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                      <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
-                        {item.surname}
-                      </span>
+              filteredReserve.map((item) => {
+                const linkedItem = item.linkedId ? reserve.find(r => r.id === item.linkedId) : null;
+                return (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={(e) => handleReserveDragStart(e, item.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1`}>
+                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                          {item.surname}
+                        </span>
+                      </div>
+                      {linkedItem && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUnlinkReserve(item.id);
+                            }}
+                            className="h-7 w-7 p-0 hover:bg-destructive/10"
+                            title="Разорвать связь"
+                          >
+                            <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                          </Button>
+                          <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
+                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
+                              {linkedItem.surname}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    {item.surname2 && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUnlinkReserve(item.id);
-                          }}
-                          className="h-7 w-7 p-0 hover:bg-destructive/10"
-                          title="Разорвать связь"
-                        >
-                          <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
-                        </Button>
-                        <div className={`border-2 ${colorOptions.find(c => c.value === item.color2)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color2)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
-                          <span className={`${colorOptions.find(c => c.value === item.color2)?.text} font-semibold text-sm`}>
-                            {item.surname2}
-                          </span>
-                        </div>
-                      </>
-                    )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </Card>
