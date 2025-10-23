@@ -675,9 +675,11 @@ export const DataTable = () => {
     }
   };
 
-  const filteredReserve = reserve.filter(item => 
-    item.surname.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredReserve = reserve.filter(item => {
+    const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
+    const isLinkedSecond = item.linkedId && reserve.find(r => r.id === item.linkedId && r.id < item.id);
+    return hasMatch && !isLinkedSecond;
+  });
 
   const filteredWeekend = weekend.filter(item => 
     item.surname.toLowerCase().includes(searchQuery.toLowerCase())
