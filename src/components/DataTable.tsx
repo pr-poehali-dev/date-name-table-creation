@@ -91,8 +91,8 @@ const SingleTable: React.FC<SingleTableProps> = ({
     const row = initialData.find(r => r.id === id);
     if (row && row.surname.trim()) {
       onDeleteToReserve(row.surname, row.color);
+      onDataChange(initialData.map(r => r.id === id ? { ...r, surname: '', color: 'blue' } : r));
     }
-    onDataChange(initialData.filter(r => r.id !== id));
   };
 
   const handleAdd = () => {
