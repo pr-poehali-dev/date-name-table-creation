@@ -397,12 +397,18 @@ export const DataTable = () => {
     { id: 'r1', surname: 'Алексеев', color: 'purple' },
     { id: 'r2', surname: 'Новиков', color: 'pink' },
   ]);
+
+  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string}>>([]);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
+  const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
   const [isOverReserve, setIsOverReserve] = useState(false);
+  const [isOverWeekend, setIsOverWeekend] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [newReserveName, setNewReserveName] = useState('');
   const [isAddingToReserve, setIsAddingToReserve] = useState(false);
+  const [newWeekendName, setNewWeekendName] = useState('');
+  const [isAddingToWeekend, setIsAddingToWeekend] = useState(false);
   
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -452,12 +458,58 @@ export const DataTable = () => {
     setIsOverReserve(false);
   };
 
+  const handleWeekendDragStart = (e: React.DragEvent, id: string) => {
+    const item = weekend.find(w => w.id === id);
+    if (item) {
+      setDraggedItem({ surname: item.surname, color: item.color });
+      setDraggedId(id);
+      setDraggedFromWeekend(true);
+    }
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleWeekendDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setIsOverWeekend(true);
+  };
+
+  const handleWeekendDragLeave = () => {
+    setIsOverWeekend(false);
+  };
+
+  const handleDropToWeekend = (e: React.DragEvent) => {
+    e.preventDefault();
+    
+    if (!draggedId || draggedFromWeekend) {
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverWeekend(false);
+      return;
+    }
+
+    const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
+    if (draggedRow && draggedRow.surname) {
+      const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
+      setWeekend([...weekend, { id: newWeekendId, surname: draggedRow.surname, color: draggedRow.color }]);
+      
+      setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+      setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+    }
+
+    setDraggedId(null);
+    setDraggedItem(null);
+    setIsOverWeekend(false);
+  };
+
   const handleDragEnd = () => {
     setDraggedId(null);
     setDragOverId(null);
     setDraggedItem(null);
     setDraggedFromReserve(false);
+    setDraggedFromWeekend(false);
     setIsOverReserve(false);
+    setIsOverWeekend(false);
   };
 
   const handleAddToReserve = () => {
@@ -469,6 +521,15 @@ export const DataTable = () => {
     setIsAddingToReserve(false);
   };
 
+  const handleAddToWeekend = () => {
+    if (!newWeekendName.trim()) return;
+    
+    const newId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
+    setWeekend([...weekend, { id: newId, surname: newWeekendName.trim(), color: 'blue' }]);
+    setNewWeekendName('');
+    setIsAddingToWeekend(false);
+  };
+
   const handleDeleteToReserve = (surname: string, color: string) => {
     const newId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
     setReserve([...reserve, { id: newId, surname, color }]);
@@ -478,10 +539,15 @@ export const DataTable = () => {
     item.surname.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredWeekend = weekend.filter(item => 
+    item.surname.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleDragFromTable = (item: {surname: string; color: string}, id: string) => {
     setDraggedItem(item);
     setDraggedId(id);
     setDraggedFromReserve(false);
+    setDraggedFromWeekend(false);
   };
 
   const handleDropToTable = (dataSet: TableRow[], setDataSet: (data: TableRow[]) => void, targetId: string) => {
@@ -494,6 +560,15 @@ export const DataTable = () => {
           : row
       ));
       setReserve(reserve.filter(r => r.id !== draggedId));
+    }
+
+    if (draggedFromWeekend && draggedItem) {
+      setDataSet(dataSet.map(row => 
+        row.id === targetId 
+          ? { ...row, surname: draggedItem.surname, color: draggedItem.color }
+          : row
+      ));
+      setWeekend(weekend.filter(w => w.id !== draggedId));
     }
 
     handleDragEnd();
@@ -624,6 +699,100 @@ export const DataTable = () => {
                   key={item.id}
                   draggable
                   onDragStart={(e) => handleReserveDragStart(e, item.id)}
+                  onDragEnd={handleDragEnd}
+                  className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                >
+                  <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}>
+                    <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                    <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                      {item.surname}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+
+        <Card 
+          className="w-72 shrink-0 overflow-hidden transition-colors"
+          style={{ 
+            boxShadow: isOverWeekend ? '0 0 0 3px hsl(var(--accent))' : undefined,
+          }}
+          onDragOver={handleWeekendDragOver}
+          onDragLeave={handleWeekendDragLeave}
+          onDrop={handleDropToWeekend}
+        >
+          <div className="bg-orange-100 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon name="CalendarOff" size={18} className="text-orange-700" />
+                <h2 className="text-base font-bold text-orange-700 tracking-tight">
+                  Выходные
+                </h2>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setIsAddingToWeekend(true)}
+                variant="outline"
+                className="border-orange-300 text-orange-700 hover:bg-orange-200 h-7 w-7 p-0"
+              >
+                <Icon name="UserPlus" size={14} />
+              </Button>
+            </div>
+
+            {isAddingToWeekend && (
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Введите фамилию..."
+                  value={newWeekendName}
+                  onChange={(e) => setNewWeekendName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddToWeekend();
+                    if (e.key === 'Escape') {
+                      setIsAddingToWeekend(false);
+                      setNewWeekendName('');
+                    }
+                  }}
+                  className="flex-1 h-8 text-sm bg-white border-orange-300"
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAddToWeekend}
+                  className="bg-orange-500 hover:bg-orange-600 text-white h-8 w-8 p-0"
+                >
+                  <Icon name="Check" size={14} />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddingToWeekend(false);
+                    setNewWeekendName('');
+                  }}
+                  className="border-orange-300 h-8 w-8 p-0"
+                >
+                  <Icon name="X" size={14} />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
+            {filteredWeekend.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="CalendarX" size={32} className="mx-auto mb-3 opacity-20" />
+                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
+                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              </div>
+            ) : (
+              filteredWeekend.map((item) => (
+                <div
+                  key={item.id}
+                  draggable
+                  onDragStart={(e) => handleWeekendDragStart(e, item.id)}
                   onDragEnd={handleDragEnd}
                   className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
                 >
