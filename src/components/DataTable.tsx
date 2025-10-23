@@ -43,7 +43,7 @@ interface SingleTableProps {
   searchQuery: string;
   onDragFromTable: (item: {surname: string; color: string}, id: string) => void;
   onDragFromTable2: (item: {surname: string; color: string}, id: string) => void;
-  onDropToTable: (targetId: string, item: {surname: string; color: string} | null, fromReserve: boolean, draggedId: string | null) => void;
+  onDropToTable: (targetId: string, item: {surname: string; color: string} | null, fromReserve: boolean, draggedId: string | null, toSecondCell?: boolean) => void;
   draggedId: string | null;
   dragOverId: string | null;
   setDragOverId: (id: string | null) => void;
@@ -68,6 +68,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const timeSlots = generateTimeSlots();
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2' } | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [dragOverSecondCell, setDragOverSecondCell] = useState<string | null>(null);
 
   const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2', currentValue: string) => {
     setEditingCell({ id, field });
@@ -322,9 +323,32 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           ) : (
                             <div 
                               onClick={() => handleEdit(row.id, 'surname2', row.surname2 || '')}
-                              className="cursor-pointer transition-colors font-medium flex items-center gap-1"
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setDragOverSecondCell(row.id);
+                              }}
+                              onDragLeave={(e) => {
+                                e.stopPropagation();
+                                setDragOverSecondCell(null);
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (draggedId && draggedId !== row.id) {
+                                  onDropToTable(row.id, null, false, draggedId, true);
+                                }
+                                setDragOverSecondCell(null);
+                              }}
+                              className={`cursor-pointer transition-colors font-medium flex items-center gap-1 ${
+                                dragOverSecondCell === row.id ? 'scale-110' : ''
+                              }`}
                             >
-                              <div className="border-2 border-dashed border-gray-300 rounded-lg px-3 py-1 bg-gray-50 hover:bg-gray-100 transition-colors shadow-sm">
+                              <div className={`border-2 ${
+                                dragOverSecondCell === row.id 
+                                  ? 'border-accent bg-accent/20' 
+                                  : 'border-dashed border-gray-300 bg-gray-50'
+                              } rounded-lg px-3 py-1 hover:bg-gray-100 transition-all shadow-sm`}>
                                 <span className="text-gray-400 font-semibold text-sm">+</span>
                               </div>
                             </div>
@@ -636,13 +660,15 @@ export const DataTable = () => {
     setDraggedFromSecond(true);
   };
 
-  const handleDropToTable = (dataSet: TableRow[], setDataSet: (data: TableRow[]) => void, targetId: string) => {
+  const handleDropToTable = (dataSet: TableRow[], setDataSet: (data: TableRow[]) => void, targetId: string, toSecondCell: boolean = false) => {
     if (!draggedId) return;
 
     if (draggedFromReserve && draggedItem) {
       setDataSet(dataSet.map(row => 
         row.id === targetId 
-          ? { ...row, surname: draggedItem.surname, color: draggedItem.color }
+          ? toSecondCell 
+            ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
+            : { ...row, surname: draggedItem.surname, color: draggedItem.color }
           : row
       ));
       setReserve(reserve.filter(r => r.id !== draggedId));
@@ -651,7 +677,9 @@ export const DataTable = () => {
     if (draggedFromWeekend && draggedItem) {
       setDataSet(dataSet.map(row => 
         row.id === targetId 
-          ? { ...row, surname: draggedItem.surname, color: draggedItem.color }
+          ? toSecondCell 
+            ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
+            : { ...row, surname: draggedItem.surname, color: draggedItem.color }
           : row
       ));
       setWeekend(weekend.filter(w => w.id !== draggedId));
@@ -685,7 +713,7 @@ export const DataTable = () => {
           searchQuery={searchQuery}
           onDragFromTable={handleDragFromTable}
           onDragFromTable2={handleDragFromTable2}
-          onDropToTable={(targetId) => handleDropToTable(data1, setData1, targetId)}
+          onDropToTable={(targetId, item, fromReserve, draggedId, toSecondCell) => handleDropToTable(data1, setData1, targetId, toSecondCell)}
           draggedId={draggedId}
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
@@ -700,7 +728,7 @@ export const DataTable = () => {
           searchQuery={searchQuery}
           onDragFromTable={handleDragFromTable}
           onDragFromTable2={handleDragFromTable2}
-          onDropToTable={(targetId) => handleDropToTable(data2, setData2, targetId)}
+          onDropToTable={(targetId, item, fromReserve, draggedId, toSecondCell) => handleDropToTable(data2, setData2, targetId, toSecondCell)}
           draggedId={draggedId}
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
