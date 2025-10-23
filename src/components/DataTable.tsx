@@ -662,6 +662,19 @@ export const DataTable = () => {
     }
   };
 
+  const handleUnlinkReserve = (id: string) => {
+    const item = reserve.find(r => r.id === id);
+    if (item?.linkedId) {
+      setReserve(reserve.map(r => {
+        if (r.id === id || r.id === item.linkedId) {
+          const { linkedId, surname2, color2, ...rest } = r;
+          return rest;
+        }
+        return r;
+      }));
+    }
+  };
+
   const filteredReserve = reserve.filter(item => 
     item.surname.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -876,11 +889,25 @@ export const DataTable = () => {
                       </span>
                     </div>
                     {item.surname2 && (
-                      <div className={`border-2 ${colorOptions.find(c => c.value === item.color2)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color2)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
-                        <span className={`${colorOptions.find(c => c.value === item.color2)?.text} font-semibold text-sm`}>
-                          {item.surname2}
-                        </span>
-                      </div>
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnlinkReserve(item.id);
+                          }}
+                          className="h-7 w-7 p-0 hover:bg-destructive/10"
+                          title="Разорвать связь"
+                        >
+                          <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                        </Button>
+                        <div className={`border-2 ${colorOptions.find(c => c.value === item.color2)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color2)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
+                          <span className={`${colorOptions.find(c => c.value === item.color2)?.text} font-semibold text-sm`}>
+                            {item.surname2}
+                          </span>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
