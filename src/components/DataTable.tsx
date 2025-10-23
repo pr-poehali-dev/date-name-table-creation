@@ -90,7 +90,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
   };
 
   const handleAdd = () => {
-    const newId = (Math.max(...initialData.map(r => parseInt(r.id)), 0) + 1).toString();
+    const newId = `${title}-${Date.now()}`;
     
     let newTime = '09:00';
     let newDate = new Date().toISOString().split('T')[0];
@@ -344,14 +344,14 @@ const SingleTable: React.FC<SingleTableProps> = ({
 
 export const DataTable = () => {
   const [data1, setData1] = useState<TableRow[]>([
-    { id: '1', date: '2025-01-20', time: '09:00', surname: 'Иванов', color: 'red' },
-    { id: '2', date: '2025-01-20', time: '09:15', surname: 'Петров', color: 'blue' },
-    { id: '3', date: '2025-01-20', time: '09:30', surname: 'Сидоров', color: 'green' },
+    { id: 't1-1', date: '2025-01-20', time: '09:00', surname: 'Иванов', color: 'red' },
+    { id: 't1-2', date: '2025-01-20', time: '09:15', surname: 'Петров', color: 'blue' },
+    { id: 't1-3', date: '2025-01-20', time: '09:30', surname: 'Сидоров', color: 'green' },
   ]);
 
   const [data2, setData2] = useState<TableRow[]>([
-    { id: '1', date: '2025-01-21', time: '10:00', surname: 'Кузнецов', color: 'yellow' },
-    { id: '2', date: '2025-01-21', time: '10:15', surname: 'Смирнов', color: 'purple' },
+    { id: 't2-1', date: '2025-01-21', time: '10:00', surname: 'Кузнецов', color: 'yellow' },
+    { id: 't2-2', date: '2025-01-21', time: '10:15', surname: 'Смирнов', color: 'purple' },
   ]);
   
   const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string}>>([
