@@ -42,6 +42,7 @@ interface SingleTableProps {
   onDataChange: (data: TableRow[]) => void;
   searchQuery: string;
   onDragFromTable: (item: {surname: string; color: string}, id: string) => void;
+  onDragFromTable2: (item: {surname: string; color: string}, id: string) => void;
   onDropToTable: (targetId: string, item: {surname: string; color: string} | null, fromReserve: boolean, draggedId: string | null) => void;
   draggedId: string | null;
   dragOverId: string | null;
@@ -56,6 +57,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
   onDataChange, 
   searchQuery,
   onDragFromTable,
+  onDragFromTable2,
   onDropToTable,
   draggedId,
   dragOverId,
@@ -135,6 +137,14 @@ const SingleTable: React.FC<SingleTableProps> = ({
     const row = initialData.find(r => r.id === id);
     if (row) {
       onDragFromTable({ surname: row.surname, color: row.color }, id);
+    }
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragStart2 = (e: React.DragEvent, id: string) => {
+    const row = initialData.find(r => r.id === id);
+    if (row && row.surname2) {
+      onDragFromTable2({ surname: row.surname2, color: row.color2 || 'green' }, id);
     }
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -296,14 +306,29 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
                             </div>
                           </div>
-                          <div 
-                            onClick={() => handleEdit(row.id, 'surname2', row.surname2 || '')}
-                            className="cursor-pointer transition-colors font-medium flex items-center gap-1"
-                          >
-                            <div className={`border-2 ${row.surname2 ? colorOptions.find(c => c.value === row.color2)?.border : 'border-dashed border-gray-300'} rounded-lg px-3 py-1 ${row.surname2 ? colorOptions.find(c => c.value === row.color2)?.bg : 'bg-gray-50'} hover:bg-gray-100 transition-colors shadow-sm`}>
-                              <span className={`${row.surname2 ? colorOptions.find(c => c.value === row.color2)?.text : 'text-gray-400'} font-semibold text-sm`}>{row.surname2 || '+'}</span>
+                          {row.surname2 ? (
+                            <div 
+                              draggable={!editingCell}
+                              onDragStart={(e) => handleDragStart2(e, row.id)}
+                              onDragEnd={onDragEnd}
+                              onClick={() => handleEdit(row.id, 'surname2', row.surname2 || '')}
+                              className="cursor-move transition-colors font-medium flex items-center gap-1"
+                            >
+                              <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                              <div className={`border-2 ${colorOptions.find(c => c.value === row.color2)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm`}>
+                                <span className={`${colorOptions.find(c => c.value === row.color2)?.text} font-semibold text-sm`}>{row.surname2}</span>
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div 
+                              onClick={() => handleEdit(row.id, 'surname2', row.surname2 || '')}
+                              className="cursor-pointer transition-colors font-medium flex items-center gap-1"
+                            >
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg px-3 py-1 bg-gray-50 hover:bg-gray-100 transition-colors shadow-sm">
+                                <span className="text-gray-400 font-semibold text-sm">+</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </td>
@@ -443,6 +468,7 @@ export const DataTable = () => {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [draggedItem, setDraggedItem] = useState<{surname: string; color: string} | null>(null);
+  const [draggedFromSecond, setDraggedFromSecond] = useState(false);
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);
@@ -471,21 +497,31 @@ export const DataTable = () => {
       setDraggedId(null);
       setDraggedItem(null);
       setIsOverReserve(false);
+      setDraggedFromSecond(false);
       return;
     }
 
     const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
-    if (draggedRow && draggedRow.surname) {
-      const newReserveId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
-      setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color }]);
-      
-      setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
-      setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+    if (draggedRow) {
+      if (draggedFromSecond && draggedRow.surname2) {
+        const newReserveId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
+        setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green' }]);
+        
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
+      } else if (draggedRow.surname) {
+        const newReserveId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
+        setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color }]);
+        
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+      }
     }
 
     setDraggedId(null);
     setDraggedItem(null);
     setIsOverReserve(false);
+    setDraggedFromSecond(false);
   };
 
   const handleWeekendDragStart = (e: React.DragEvent, id: string) => {
@@ -515,21 +551,31 @@ export const DataTable = () => {
       setDraggedId(null);
       setDraggedItem(null);
       setIsOverWeekend(false);
+      setDraggedFromSecond(false);
       return;
     }
 
     const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
-    if (draggedRow && draggedRow.surname) {
-      const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
-      setWeekend([...weekend, { id: newWeekendId, surname: draggedRow.surname, color: draggedRow.color }]);
-      
-      setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
-      setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+    if (draggedRow) {
+      if (draggedFromSecond && draggedRow.surname2) {
+        const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
+        setWeekend([...weekend, { id: newWeekendId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green' }]);
+        
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
+      } else if (draggedRow.surname) {
+        const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
+        setWeekend([...weekend, { id: newWeekendId, surname: draggedRow.surname, color: draggedRow.color }]);
+        
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+      }
     }
 
     setDraggedId(null);
     setDraggedItem(null);
     setIsOverWeekend(false);
+    setDraggedFromSecond(false);
   };
 
   const handleDragEnd = () => {
@@ -538,6 +584,7 @@ export const DataTable = () => {
     setDraggedItem(null);
     setDraggedFromReserve(false);
     setDraggedFromWeekend(false);
+    setDraggedFromSecond(false);
     setIsOverReserve(false);
     setIsOverWeekend(false);
   };
@@ -578,6 +625,15 @@ export const DataTable = () => {
     setDraggedId(id);
     setDraggedFromReserve(false);
     setDraggedFromWeekend(false);
+    setDraggedFromSecond(false);
+  };
+
+  const handleDragFromTable2 = (item: {surname: string; color: string}, id: string) => {
+    setDraggedItem(item);
+    setDraggedId(id);
+    setDraggedFromReserve(false);
+    setDraggedFromWeekend(false);
+    setDraggedFromSecond(true);
   };
 
   const handleDropToTable = (dataSet: TableRow[], setDataSet: (data: TableRow[]) => void, targetId: string) => {
@@ -628,6 +684,7 @@ export const DataTable = () => {
           onDataChange={setData1}
           searchQuery={searchQuery}
           onDragFromTable={handleDragFromTable}
+          onDragFromTable2={handleDragFromTable2}
           onDropToTable={(targetId) => handleDropToTable(data1, setData1, targetId)}
           draggedId={draggedId}
           dragOverId={dragOverId}
@@ -642,6 +699,7 @@ export const DataTable = () => {
           onDataChange={setData2}
           searchQuery={searchQuery}
           onDragFromTable={handleDragFromTable}
+          onDragFromTable2={handleDragFromTable2}
           onDropToTable={(targetId) => handleDropToTable(data2, setData2, targetId)}
           draggedId={draggedId}
           dragOverId={dragOverId}
