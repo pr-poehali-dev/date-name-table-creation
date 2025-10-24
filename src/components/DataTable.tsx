@@ -637,6 +637,17 @@ export const DataTable = () => {
       return;
     }
 
+    if (draggedFromOtherJobs && draggedItem) {
+      const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
+      setWeekend([...weekend.filter(w => w.surname !== draggedItem.surname), { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
+      setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
+      
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverWeekend(false);
+      return;
+    }
+
     const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
     if (draggedRow) {
       if (draggedFromSecond && draggedRow.surname2) {
@@ -694,6 +705,17 @@ export const DataTable = () => {
       setDraggedItem(null);
       setIsOverOtherJobs(false);
       setDraggedFromSecond(false);
+      return;
+    }
+
+    if (draggedFromWeekend && draggedItem) {
+      const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
+      setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
+      setWeekend(weekend.filter(w => w.id !== draggedId));
+      
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverOtherJobs(false);
       return;
     }
 
