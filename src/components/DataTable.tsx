@@ -709,8 +709,9 @@ export const DataTable = () => {
     }
 
     if (draggedFromWeekend && draggedItem) {
+      const currentCounter = surnameCounters[draggedItem.surname] || 0;
       const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
-      setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
+      setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter }]);
       setWeekend(weekend.filter(w => w.id !== draggedId));
       
       setDraggedId(null);
@@ -722,19 +723,21 @@ export const DataTable = () => {
     const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
     if (draggedRow) {
       if (draggedFromSecond && draggedRow.surname2) {
-        setSurnameCounters({...surnameCounters, [draggedRow.surname2]: 0});
+        const currentCounter = surnameCounters[draggedRow.surname2] || 0;
+        setSurnameCounters({...surnameCounters, [draggedRow.surname2]: currentCounter});
         
         const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
-        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedRow.surname2), { id: newOtherJobsId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', counter: 0 }]);
+        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedRow.surname2), { id: newOtherJobsId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', counter: currentCounter }]);
         setReserve(reserve.filter(r => r.surname !== draggedRow.surname2));
         
         setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
         setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
       } else if (draggedRow.surname) {
-        setSurnameCounters({...surnameCounters, [draggedRow.surname]: 0});
+        const currentCounter = surnameCounters[draggedRow.surname] || 0;
+        setSurnameCounters({...surnameCounters, [draggedRow.surname]: currentCounter});
         
         const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
-        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedRow.surname), { id: newOtherJobsId, surname: draggedRow.surname, color: draggedRow.color, counter: 0 }]);
+        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedRow.surname), { id: newOtherJobsId, surname: draggedRow.surname, color: draggedRow.color, counter: currentCounter }]);
         setReserve(reserve.filter(r => r.surname !== draggedRow.surname));
         
         setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '', counter: 0 } : row));
