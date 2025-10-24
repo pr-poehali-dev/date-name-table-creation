@@ -509,8 +509,8 @@ export const DataTable = () => {
     { id: 'r3', surname: 'Морозов', color: 'green', linkedId: 'r2', counter: 0 },
   ]);
 
-  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; counter?: number}>>([]);
-  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; counter?: number}>>([]);
+  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([]);
+  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([]);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
@@ -533,6 +533,7 @@ export const DataTable = () => {
   const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [surnameCounters, setSurnameCounters] = useState<Record<string, number>>({});
+  const [linkingMode, setLinkingMode] = useState<{ source: 'reserve' | 'weekend' | 'otherJobs'; id: string } | null>(null);
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);
@@ -842,19 +843,86 @@ export const DataTable = () => {
     }
   };
 
+  const handleLinkItems = (source: 'reserve' | 'weekend' | 'otherJobs', id: string) => {
+    if (!linkingMode) {
+      setLinkingMode({ source, id });
+      return;
+    }
+
+    if (linkingMode.source !== source) {
+      setLinkingMode(null);
+      return;
+    }
+
+    if (linkingMode.id === id) {
+      setLinkingMode(null);
+      return;
+    }
+
+    if (source === 'reserve') {
+      const firstItem = reserve.find(r => r.id === linkingMode.id);
+      const secondItem = reserve.find(r => r.id === id);
+      
+      if (firstItem?.linkedId || secondItem?.linkedId) {
+        setLinkingMode(null);
+        return;
+      }
+
+      setReserve(reserve.map(r => {
+        if (r.id === linkingMode.id) return { ...r, linkedId: id };
+        if (r.id === id) return { ...r, linkedId: linkingMode.id };
+        return r;
+      }));
+    } else if (source === 'weekend') {
+      const firstItem = weekend.find(w => w.id === linkingMode.id);
+      const secondItem = weekend.find(w => w.id === id);
+      
+      if (firstItem?.linkedId || secondItem?.linkedId) {
+        setLinkingMode(null);
+        return;
+      }
+
+      setWeekend(weekend.map(w => {
+        if (w.id === linkingMode.id) return { ...w, linkedId: id };
+        if (w.id === id) return { ...w, linkedId: linkingMode.id };
+        return w;
+      }));
+    } else if (source === 'otherJobs') {
+      const firstItem = otherJobs.find(o => o.id === linkingMode.id);
+      const secondItem = otherJobs.find(o => o.id === id);
+      
+      if (firstItem?.linkedId || secondItem?.linkedId) {
+        setLinkingMode(null);
+        return;
+      }
+
+      setOtherJobs(otherJobs.map(o => {
+        if (o.id === linkingMode.id) return { ...o, linkedId: id };
+        if (o.id === id) return { ...o, linkedId: linkingMode.id };
+        return o;
+      }));
+    }
+
+    setLinkingMode(null);
+  };
+
   const filteredReserve = reserve.filter(item => {
     const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
     const isLinkedSecond = item.linkedId && reserve.find(r => r.id === item.linkedId && r.id < item.id);
     return hasMatch && !isLinkedSecond;
   });
 
-  const filteredWeekend = weekend.filter(item => 
-    item.surname.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredWeekend = weekend.filter(item => {
+    const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
+    const isLinkedSecond = item.linkedId && weekend.find(w => w.id === item.linkedId && w.id < item.id);
+    return hasMatch && !isLinkedSecond;
+  });
 
-  const filteredOtherJobs = otherJobs.filter(item => 
-    item.surname.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOtherJobs = otherJobs.filter(item => {
+    const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
+    const isLinkedSecond = item.linkedId && otherJobs.find(o => o.id === item.linkedId && o.id < item.id);
+    return hasMatch && !isLinkedSecond;
+  });
 
   const handleDragFromTable = (item: {surname: string; color: string}, id: string) => {
     setDraggedItem(item);
@@ -1120,13 +1188,29 @@ export const DataTable = () => {
                     className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
                   >
                     <div className="flex items-center gap-2">
-                      <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1`}>
+                      <div 
+                        className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1 ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                      >
                         <Icon name="GripVertical" size={14} className="text-muted-foreground" />
                         <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
                         <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
                           {item.surname}
                         </span>
                       </div>
+                      {!linkedItem && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLinkItems('reserve', item.id);
+                          }}
+                          className={`h-7 w-7 p-0 ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                          title="Связать с другой фамилией"
+                        >
+                          <Icon name="Link" size={14} className="text-muted-foreground" />
+                        </Button>
+                      )}
                       {linkedItem && (
                         <>
                           <Button
@@ -1231,42 +1315,90 @@ export const DataTable = () => {
                 <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
-              filteredWeekend.map((item) => (
-                <div
-                  key={item.id}
-                  draggable
-                  onDragStart={(e) => handleWeekendDragStart(e, item.id)}
-                  onDragEnd={handleDragEnd}
-                  className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
-                >
-                  <div className="flex items-center gap-2">
-                    {editingCell?.id === item.id && editingCell.field === 'surname' ? (
-                      <Input
-                        type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleSave();
-                          if (e.key === 'Escape') handleCancel();
-                        }}
-                        className="flex-1 h-9 text-sm"
-                        autoFocus
-                      />
-                    ) : (
-                      <div 
-                        onClick={() => handleEdit(item.id, 'surname', item.surname)}
-                        className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}
-                      >
-                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
-                          {item.surname}
-                        </span>
-                      </div>
-                    )}
+              filteredWeekend.map((item) => {
+                const linkedItem = item.linkedId ? weekend.find(w => w.id === item.linkedId) : null;
+                return (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={(e) => handleWeekendDragStart(e, item.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {editingCell?.id === item.id && editingCell.field === 'surname' ? (
+                        <Input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSave();
+                            if (e.key === 'Escape') handleCancel();
+                          }}
+                          className="flex-1 h-9 text-sm"
+                          autoFocus
+                        />
+                      ) : (
+                        <>
+                          <div 
+                            onClick={() => handleEdit(item.id, 'surname', item.surname)}
+                            className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                          >
+                            <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                            <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                            <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                              {item.surname}
+                            </span>
+                          </div>
+                          {!linkedItem && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleLinkItems('weekend', item.id);
+                              }}
+                              className={`h-7 w-7 p-0 ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                              title="Связать с другой фамилией"
+                            >
+                              <Icon name="Link" size={14} className="text-muted-foreground" />
+                            </Button>
+                          )}
+                          {linkedItem && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const linkedId = item.linkedId;
+                                  setWeekend(weekend.map(w => {
+                                    if (w.id === item.id || w.id === linkedId) {
+                                      const { linkedId: _, ...rest } = w;
+                                      return rest;
+                                    }
+                                    return w;
+                                  }));
+                                }}
+                                className="h-7 w-7 p-0 hover:bg-destructive/10"
+                                title="Разорвать связь"
+                              >
+                                <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                              </Button>
+                              <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
+                                <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                                <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
+                                  {linkedItem.surname}
+                                </span>
+                              </div>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </Card>
@@ -1345,27 +1477,73 @@ export const DataTable = () => {
                 <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
-              filteredOtherJobs.map((item) => (
-                <div
-                  key={item.id}
-                  draggable
-                  onDragStart={(e) => handleOtherJobsDragStart(e, item.id)}
-                  onDragEnd={handleDragEnd}
-                  className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div 
-                      className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}
-                    >
-                      <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                      <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                      <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
-                        {item.surname}
-                      </span>
+              filteredOtherJobs.map((item) => {
+                const linkedItem = item.linkedId ? otherJobs.find(o => o.id === item.linkedId) : null;
+                return (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={(e) => handleOtherJobsDragStart(e, item.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                      >
+                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                          {item.surname}
+                        </span>
+                      </div>
+                      {!linkedItem && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLinkItems('otherJobs', item.id);
+                          }}
+                          className={`h-7 w-7 p-0 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                          title="Связать с другой фамилией"
+                        >
+                          <Icon name="Link" size={14} className="text-muted-foreground" />
+                        </Button>
+                      )}
+                      {linkedItem && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const linkedId = item.linkedId;
+                              setOtherJobs(otherJobs.map(o => {
+                                if (o.id === item.id || o.id === linkedId) {
+                                  const { linkedId: _, ...rest } = o;
+                                  return rest;
+                                }
+                                return o;
+                              }));
+                            }}
+                            className="h-7 w-7 p-0 hover:bg-destructive/10"
+                            title="Разорвать связь"
+                          >
+                            <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                          </Button>
+                          <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
+                            <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
+                              {linkedItem.surname}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </Card>
