@@ -541,6 +541,37 @@ export const DataTable = () => {
       setDraggedItem({ surname: item.surname, color: item.color });
       setDraggedId(id);
       setDraggedFromReserve(true);
+      
+      if (item.linkedId) {
+        const linkedItem = reserve.find(r => r.id === item.linkedId);
+        if (linkedItem) {
+          const dragPreview = document.createElement('div');
+          dragPreview.style.position = 'absolute';
+          dragPreview.style.top = '-1000px';
+          dragPreview.style.display = 'flex';
+          dragPreview.style.gap = '8px';
+          dragPreview.style.padding = '8px';
+          dragPreview.style.background = 'white';
+          dragPreview.style.borderRadius = '8px';
+          dragPreview.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+          
+          const colorClass1 = colorOptions.find(c => c.value === item.color);
+          const colorClass2 = colorOptions.find(c => c.value === linkedItem.color);
+          
+          dragPreview.innerHTML = `
+            <div style="border: 2px solid ${colorClass1?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass1?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+              <span style="font-weight: 600; font-size: 14px;">${item.surname}</span>
+            </div>
+            <div style="border: 2px solid ${colorClass2?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass2?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+              <span style="font-weight: 600; font-size: 14px;">${linkedItem.surname}</span>
+            </div>
+          `;
+          
+          document.body.appendChild(dragPreview);
+          e.dataTransfer.setDragImage(dragPreview, 0, 0);
+          setTimeout(() => document.body.removeChild(dragPreview), 0);
+        }
+      }
     }
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -618,6 +649,37 @@ export const DataTable = () => {
       setDraggedItem({ surname: item.surname, color: item.color });
       setDraggedId(id);
       setDraggedFromWeekend(true);
+      
+      if (item.linkedId) {
+        const linkedItem = weekend.find(w => w.id === item.linkedId);
+        if (linkedItem) {
+          const dragPreview = document.createElement('div');
+          dragPreview.style.position = 'absolute';
+          dragPreview.style.top = '-1000px';
+          dragPreview.style.display = 'flex';
+          dragPreview.style.gap = '8px';
+          dragPreview.style.padding = '8px';
+          dragPreview.style.background = 'white';
+          dragPreview.style.borderRadius = '8px';
+          dragPreview.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+          
+          const colorClass1 = colorOptions.find(c => c.value === item.color);
+          const colorClass2 = colorOptions.find(c => c.value === linkedItem.color);
+          
+          dragPreview.innerHTML = `
+            <div style="border: 2px solid ${colorClass1?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass1?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+              <span style="font-weight: 600; font-size: 14px;">${item.surname}</span>
+            </div>
+            <div style="border: 2px solid ${colorClass2?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass2?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+              <span style="font-weight: 600; font-size: 14px;">${linkedItem.surname}</span>
+            </div>
+          `;
+          
+          document.body.appendChild(dragPreview);
+          e.dataTransfer.setDragImage(dragPreview, 0, 0);
+          setTimeout(() => document.body.removeChild(dragPreview), 0);
+        }
+      }
     }
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -689,6 +751,37 @@ export const DataTable = () => {
       setDraggedItem({ surname: item.surname, color: item.color });
       setDraggedId(id);
       setDraggedFromOtherJobs(true);
+      
+      if (item.linkedId) {
+        const linkedItem = otherJobs.find(o => o.id === item.linkedId);
+        if (linkedItem) {
+          const dragPreview = document.createElement('div');
+          dragPreview.style.position = 'absolute';
+          dragPreview.style.top = '-1000px';
+          dragPreview.style.display = 'flex';
+          dragPreview.style.gap = '8px';
+          dragPreview.style.padding = '8px';
+          dragPreview.style.background = 'white';
+          dragPreview.style.borderRadius = '8px';
+          dragPreview.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+          
+          const colorClass1 = colorOptions.find(c => c.value === item.color);
+          const colorClass2 = colorOptions.find(c => c.value === linkedItem.color);
+          
+          dragPreview.innerHTML = `
+            <div style="border: 2px solid ${colorClass1?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass1?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+              <span style="font-weight: 600; font-size: 14px;">${item.surname}</span>
+            </div>
+            <div style="border: 2px solid ${colorClass2?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass2?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+              <span style="font-weight: 600; font-size: 14px;">${linkedItem.surname}</span>
+            </div>
+          `;
+          
+          document.body.appendChild(dragPreview);
+          e.dataTransfer.setDragImage(dragPreview, 0, 0);
+          setTimeout(() => document.body.removeChild(dragPreview), 0);
+        }
+      }
     }
     e.dataTransfer.effectAllowed = 'move';
   };
