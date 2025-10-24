@@ -15,6 +15,7 @@ interface TableRow {
   surname2?: string;
   color2?: string;
   counter2?: number;
+  linkedId?: string;
 }
 
 const colorOptions = [
@@ -968,21 +969,29 @@ export const DataTable = () => {
           onDragEnd={handleDragEnd}
           onReturnToReserve={(surname, color, surname2, color2) => {
             const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
-            const newReserveItems = [];
             
-            if (surname) {
+            if (surname && surname2) {
+              const newReserveId1 = `r${maxId + 1}`;
+              const newReserveId2 = `r${maxId + 2}`;
+              
+              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 9);
+              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
+              
+              setReserve([
+                ...reserve, 
+                { id: newReserveId1, surname, color, linkedId: newReserveId2, counter: counter1 },
+                { id: newReserveId2, surname: surname2, color: color2 || 'green', linkedId: newReserveId1, counter: counter2 }
+              ]);
+            } else if (surname) {
               const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
               setSurnameCounters({...surnameCounters, [surname]: counter});
-              newReserveItems.push({ id: `r${maxId + 1}`, surname, color, counter });
-            }
-            
-            if (surname2) {
+              setReserve([...reserve, { id: `r${maxId + 1}`, surname, color, counter }]);
+            } else if (surname2) {
               const counter = Math.min((surnameCounters[surname2] || 0) + 1, 9);
               setSurnameCounters({...surnameCounters, [surname2]: counter});
-              newReserveItems.push({ id: `r${maxId + 2}`, surname: surname2, color: color2 || 'green', counter });
+              setReserve([...reserve, { id: `r${maxId + 1}`, surname: surname2, color: color2 || 'green', counter }]);
             }
-            
-            setReserve([...reserve, ...newReserveItems]);
           }}
         />
 
@@ -1000,21 +1009,29 @@ export const DataTable = () => {
           onDragEnd={handleDragEnd}
           onReturnToReserve={(surname, color, surname2, color2) => {
             const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
-            const newReserveItems = [];
             
-            if (surname) {
+            if (surname && surname2) {
+              const newReserveId1 = `r${maxId + 1}`;
+              const newReserveId2 = `r${maxId + 2}`;
+              
+              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 9);
+              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
+              
+              setReserve([
+                ...reserve, 
+                { id: newReserveId1, surname, color, linkedId: newReserveId2, counter: counter1 },
+                { id: newReserveId2, surname: surname2, color: color2 || 'green', linkedId: newReserveId1, counter: counter2 }
+              ]);
+            } else if (surname) {
               const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
               setSurnameCounters({...surnameCounters, [surname]: counter});
-              newReserveItems.push({ id: `r${maxId + 1}`, surname, color, counter });
-            }
-            
-            if (surname2) {
+              setReserve([...reserve, { id: `r${maxId + 1}`, surname, color, counter }]);
+            } else if (surname2) {
               const counter = Math.min((surnameCounters[surname2] || 0) + 1, 9);
               setSurnameCounters({...surnameCounters, [surname2]: counter});
-              newReserveItems.push({ id: `r${maxId + 2}`, surname: surname2, color: color2 || 'green', counter });
+              setReserve([...reserve, { id: `r${maxId + 1}`, surname: surname2, color: color2 || 'green', counter }]);
             }
-            
-            setReserve([...reserve, ...newReserveItems]);
           }}
         />
 
