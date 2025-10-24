@@ -72,6 +72,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [dragOverSecondCell, setDragOverSecondCell] = useState<string | null>(null);
+  const [linkedRows, setLinkedRows] = useState<Set<string>>(new Set());
 
   const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2', currentValue: string) => {
     setEditingCell({ id, field });
@@ -97,6 +98,16 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const handleCancel = () => {
     setEditingCell(null);
     setEditValue('');
+  };
+
+  const handleToggleLink = (rowId: string) => {
+    const newLinkedRows = new Set(linkedRows);
+    if (newLinkedRows.has(rowId)) {
+      newLinkedRows.delete(rowId);
+    } else {
+      newLinkedRows.add(rowId);
+    }
+    setLinkedRows(newLinkedRows);
   };
 
   const handleDelete = (id: string) => {
@@ -173,6 +184,34 @@ const SingleTable: React.FC<SingleTableProps> = ({
     const row = initialData.find(r => r.id === id);
     if (row) {
       onDragFromTable({ surname: row.surname, color: row.color }, id);
+      
+      if (linkedRows.has(id) && row.surname && row.surname2) {
+        const dragPreview = document.createElement('div');
+        dragPreview.style.position = 'absolute';
+        dragPreview.style.top = '-1000px';
+        dragPreview.style.display = 'flex';
+        dragPreview.style.gap = '8px';
+        dragPreview.style.padding = '8px';
+        dragPreview.style.background = 'white';
+        dragPreview.style.borderRadius = '8px';
+        dragPreview.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        
+        const colorClass1 = colorOptions.find(c => c.value === row.color);
+        const colorClass2 = colorOptions.find(c => c.value === row.color2);
+        
+        dragPreview.innerHTML = `
+          <div style="border: 2px solid; border-color: ${colorClass1?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass1?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+            <span style="font-weight: 600; font-size: 14px;">${row.surname}</span>
+          </div>
+          <div style="border: 2px solid; border-color: ${colorClass2?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass2?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+            <span style="font-weight: 600; font-size: 14px;">${row.surname2}</span>
+          </div>
+        `;
+        
+        document.body.appendChild(dragPreview);
+        e.dataTransfer.setDragImage(dragPreview, 0, 0);
+        setTimeout(() => document.body.removeChild(dragPreview), 0);
+      }
     }
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -334,11 +373,22 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             className="cursor-move transition-colors font-medium flex items-center gap-1"
                           >
                             <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                            <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm flex items-center gap-1`}>
+                            <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm flex items-center gap-1 ${linkedRows.has(row.id) && row.surname2 ? 'ring-2 ring-accent' : ''}`}>
                               <span className={`text-xs font-mono font-bold ${(row.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 0}</span>
                               <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
                             </div>
                           </div>
+                          {row.surname && row.surname2 && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleToggleLink(row.id)}
+                              className={`h-7 w-7 p-0 ${linkedRows.has(row.id) ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                              title={linkedRows.has(row.id) ? "Разорвать связь" : "Связать фамилии"}
+                            >
+                              <Icon name={linkedRows.has(row.id) ? "Unlink" : "Link"} size={14} className="text-muted-foreground" />
+                            </Button>
+                          )}
                           {row.surname2 ? (
                             <div 
                               draggable={!editingCell}
@@ -347,7 +397,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               className="cursor-move transition-colors font-medium flex items-center gap-1"
                             >
                               <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                              <div className={`border-2 ${colorOptions.find(c => c.value === row.color2)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm flex items-center gap-1`}>
+                              <div className={`border-2 ${colorOptions.find(c => c.value === row.color2)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm flex items-center gap-1 ${linkedRows.has(row.id) ? 'ring-2 ring-accent' : ''}`}>
                                 <span className={`text-xs font-mono font-bold ${(row.counter2 || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 0}</span>
                                 <span className={`${colorOptions.find(c => c.value === row.color2)?.text} font-semibold text-sm`}>{row.surname2}</span>
                               </div>
