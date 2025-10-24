@@ -11,8 +11,10 @@ interface TableRow {
   time: string;
   surname: string;
   color: string;
+  counter?: number;
   surname2?: string;
   color2?: string;
+  counter2?: number;
 }
 
 const colorOptions = [
@@ -327,7 +329,8 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             className="cursor-move transition-colors font-medium flex items-center gap-1"
                           >
                             <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                            <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm`}>
+                            <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm flex items-center gap-1`}>
+                              <span className="text-xs text-muted-foreground font-mono">{row.counter || 0}</span>
                               <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
                             </div>
                           </div>
@@ -339,7 +342,8 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               className="cursor-move transition-colors font-medium flex items-center gap-1"
                             >
                               <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                              <div className={`border-2 ${colorOptions.find(c => c.value === row.color2)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm`}>
+                              <div className={`border-2 ${colorOptions.find(c => c.value === row.color2)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm flex items-center gap-1`}>
+                                <span className="text-xs text-muted-foreground font-mono">{row.counter2 || 0}</span>
                                 <span className={`${colorOptions.find(c => c.value === row.color2)?.text} font-semibold text-sm`}>{row.surname2}</span>
                               </div>
                             </div>
@@ -518,6 +522,7 @@ export const DataTable = () => {
   const [draggedFromSecond, setDraggedFromSecond] = useState(false);
   const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [surnameCounters, setSurnameCounters] = useState<Record<string, number>>({});
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);
@@ -555,28 +560,38 @@ export const DataTable = () => {
       const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
       
       if (draggedFromSecond && draggedRow.surname2) {
-        const newReserveId = `r${maxId + 1}`;
-        setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green' }]);
+        const counter = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 9);
+        setSurnameCounters({...surnameCounters, [draggedRow.surname2]: counter});
         
-        setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
-        setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
+        const newReserveId = `r${maxId + 1}`;
+        setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', counter }]);
+        
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
       } else if (draggedRow.surname) {
         if (draggedRow.surname2) {
           const newReserveId1 = `r${maxId + 1}`;
           const newReserveId2 = `r${maxId + 2}`;
           
+          const counter1 = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 9);
+          const counter2 = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 9);
+          setSurnameCounters({...surnameCounters, [draggedRow.surname]: counter1, [draggedRow.surname2]: counter2});
+          
           setReserve([
             ...reserve, 
-            { id: newReserveId1, surname: draggedRow.surname, color: draggedRow.color, linkedId: newReserveId2 },
-            { id: newReserveId2, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', linkedId: newReserveId1 }
+            { id: newReserveId1, surname: draggedRow.surname, color: draggedRow.color, linkedId: newReserveId2, counter: counter1 },
+            { id: newReserveId2, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', linkedId: newReserveId1, counter: counter2 }
           ]);
         } else {
+          const counter = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 9);
+          setSurnameCounters({...surnameCounters, [draggedRow.surname]: counter});
+          
           const newReserveId = `r${maxId + 1}`;
-          setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color }]);
+          setReserve([...reserve, { id: newReserveId, surname: draggedRow.surname, color: draggedRow.color, counter }]);
         }
         
-        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '', surname2: '', color2: 'green' } : row));
-        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '', surname2: '', color2: 'green' } : row));
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '', surname2: '', color2: 'green', counter: 0, counter2: 0 } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '', surname2: '', color2: 'green', counter: 0, counter2: 0 } : row));
       }
     }
 
@@ -620,19 +635,23 @@ export const DataTable = () => {
     const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
     if (draggedRow) {
       if (draggedFromSecond && draggedRow.surname2) {
+        setSurnameCounters({...surnameCounters, [draggedRow.surname2]: 0});
+        
         const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
         setWeekend([...weekend.filter(w => w.surname !== draggedRow.surname2), { id: newWeekendId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', counter: 0 }]);
         setReserve(reserve.filter(r => r.surname !== draggedRow.surname2));
         
-        setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
-        setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
       } else if (draggedRow.surname) {
+        setSurnameCounters({...surnameCounters, [draggedRow.surname]: 0});
+        
         const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
         setWeekend([...weekend.filter(w => w.surname !== draggedRow.surname), { id: newWeekendId, surname: draggedRow.surname, color: draggedRow.color, counter: 0 }]);
         setReserve(reserve.filter(r => r.surname !== draggedRow.surname));
         
-        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
-        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '', counter: 0 } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '', counter: 0 } : row));
       }
     }
 
@@ -701,10 +720,9 @@ export const DataTable = () => {
       const newId1 = `r${maxId + 1}`;
       const newId2 = `r${maxId + 2}`;
       
-      const existing1 = reserve.find(r => r.surname === surname);
-      const existing2 = reserve.find(r => r.surname === surname2);
-      const counter1 = existing1 ? Math.min((existing1.counter || 0) + 1, 9) : 1;
-      const counter2 = existing2 ? Math.min((existing2.counter || 0) + 1, 9) : 1;
+      const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 9);
+      const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+      setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
       
       setReserve([
         ...reserve.filter(r => r.surname !== surname && r.surname !== surname2), 
@@ -713,8 +731,8 @@ export const DataTable = () => {
       ]);
     } else {
       const newId = `r${maxId + 1}`;
-      const existing = reserve.find(r => r.surname === surname);
-      const counter = existing ? Math.min((existing.counter || 0) + 1, 9) : 1;
+      const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
+      setSurnameCounters({...surnameCounters, [surname]: counter});
       
       setReserve([
         ...reserve.filter(r => r.surname !== surname), 
@@ -774,7 +792,7 @@ export const DataTable = () => {
         if (linkedItem) {
           setDataSet(dataSet.map(row => 
             row.id === targetId 
-              ? { ...row, surname: draggedItem.surname, color: draggedItem.color, surname2: linkedItem.surname, color2: linkedItem.color }
+              ? { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 }
               : row
           ));
           setReserve(reserve.filter(r => r.id !== draggedId && r.id !== draggedReserveItem.linkedId));
@@ -782,8 +800,8 @@ export const DataTable = () => {
           setDataSet(dataSet.map(row => 
             row.id === targetId 
               ? toSecondCell 
-                ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
-                : { ...row, surname: draggedItem.surname, color: draggedItem.color }
+                ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedReserveItem.counter || 0 }
+                : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0 }
               : row
           ));
           setReserve(reserve.filter(r => r.id !== draggedId));
@@ -792,8 +810,8 @@ export const DataTable = () => {
         setDataSet(dataSet.map(row => 
           row.id === targetId 
             ? toSecondCell 
-              ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
-              : { ...row, surname: draggedItem.surname, color: draggedItem.color }
+              ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedReserveItem?.counter || 0 }
+              : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem?.counter || 0 }
             : row
         ));
         setReserve(reserve.filter(r => r.id !== draggedId));
@@ -801,11 +819,12 @@ export const DataTable = () => {
     }
 
     if (draggedFromWeekend && draggedItem) {
+      const draggedWeekendItem = weekend.find(w => w.id === draggedId);
       setDataSet(dataSet.map(row => 
         row.id === targetId 
           ? toSecondCell 
-            ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color }
-            : { ...row, surname: draggedItem.surname, color: draggedItem.color }
+            ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedWeekendItem?.counter || 0 }
+            : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem?.counter || 0 }
           : row
       ));
       setWeekend(weekend.filter(w => w.id !== draggedId));
