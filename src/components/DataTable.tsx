@@ -1367,26 +1367,16 @@ export const DataTable = () => {
                         autoFocus
                       />
                     ) : (
-                      <>
-                        <div 
-                          onClick={() => handleEdit(item.id, 'surname', item.surname)}
-                          className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}
-                        >
-                          <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                          <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                          <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
-                            {item.surname}
-                          </span>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setOtherJobs(otherJobs.filter(o => o.id !== item.id))}
-                          className="h-9 w-9 p-0 hover:bg-destructive/10"
-                        >
-                          <Icon name="Trash2" size={14} className="text-muted-foreground hover:text-destructive" />
-                        </Button>
-                      </>
+                      <div 
+                        onClick={() => handleEdit(item.id, 'surname', item.surname)}
+                        className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}
+                      >
+                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                          {item.surname}
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
