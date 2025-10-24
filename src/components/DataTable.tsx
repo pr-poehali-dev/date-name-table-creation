@@ -50,7 +50,6 @@ interface SingleTableProps {
   dragOverId: string | null;
   setDragOverId: (id: string | null) => void;
   onDragEnd: () => void;
-  onDeleteToReserve: (surname: string, color: string, surname2?: string, color2?: string) => void;
 }
 
 const SingleTable: React.FC<SingleTableProps> = ({ 
@@ -64,7 +63,6 @@ const SingleTable: React.FC<SingleTableProps> = ({
   draggedId,
   dragOverId,
   setDragOverId,
-  onDeleteToReserve,
   onDragEnd
 }) => {
   const timeSlots = generateTimeSlots();
@@ -98,41 +96,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
     setEditValue('');
   };
 
-  const handleDelete = (id: string) => {
-    const row = initialData.find(r => r.id === id);
-    if (row && row.surname.trim()) {
-      onDeleteToReserve(row.surname, row.color, row.surname2, row.color2);
-      
-      const updatedData = initialData.filter(r => r.id !== id);
-      
-      const lastRow = updatedData[updatedData.length - 1];
-      let newTime = '09:00';
-      let newDate = new Date().toISOString().split('T')[0];
-      
-      if (lastRow) {
-        newDate = lastRow.date;
-        const lastTime = lastRow.time;
-        const [hours, minutes] = lastTime.split(':').map(Number);
-        let totalMinutes = hours * 60 + minutes + 15;
-        
-        if (totalMinutes >= 1440) {
-          totalMinutes = 0;
-          const lastDate = new Date(lastRow.date);
-          lastDate.setDate(lastDate.getDate() + 1);
-          newDate = lastDate.toISOString().split('T')[0];
-        } else {
-          newDate = lastRow.date;
-        }
-        
-        const newHours = Math.floor(totalMinutes / 60);
-        const newMinutes = totalMinutes % 60;
-        newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
-      }
-      
-      const newId = `${title}-${Date.now()}`;
-      onDataChange([...updatedData, { id: newId, date: newDate, time: newTime, surname: '', color: 'red', surname2: '', color2: 'green' }]);
-    }
-  };
+
 
   const handleAdd = () => {
     const newId = `${title}-${Date.now()}`;
@@ -429,16 +393,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               <Icon name="X" size={14} />
                             </Button>
                           </>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleDelete(row.id)}
-                            className="h-7 w-7 p-0"
-                          >
-                            <Icon name="Trash2" size={14} />
-                          </Button>
-                        )}
+                        ) : null}
                       </div>
                     </td>
                   </tr>
@@ -822,33 +777,7 @@ export const DataTable = () => {
     setEditValue('');
   };
 
-  const handleDeleteToReserve = (surname: string, color: string, surname2?: string, color2?: string) => {
-    const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
-    
-    if (surname2) {
-      const newId1 = `r${maxId + 1}`;
-      const newId2 = `r${maxId + 2}`;
-      
-      const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 9);
-      const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 9);
-      setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
-      
-      setReserve([
-        ...reserve.filter(r => r.surname !== surname && r.surname !== surname2), 
-        { id: newId1, surname, color, linkedId: newId2, counter: counter1 },
-        { id: newId2, surname: surname2, color: color2 || 'green', linkedId: newId1, counter: counter2 }
-      ]);
-    } else {
-      const newId = `r${maxId + 1}`;
-      const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
-      setSurnameCounters({...surnameCounters, [surname]: counter});
-      
-      setReserve([
-        ...reserve.filter(r => r.surname !== surname), 
-        { id: newId, surname, color, counter }
-      ]);
-    }
-  };
+
 
   const handleUnlinkReserve = (id: string) => {
     const item = reserve.find(r => r.id === id);
@@ -988,7 +917,6 @@ export const DataTable = () => {
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
           onDragEnd={handleDragEnd}
-          onDeleteToReserve={handleDeleteToReserve}
         />
 
         <SingleTable 
@@ -1003,7 +931,6 @@ export const DataTable = () => {
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
           onDragEnd={handleDragEnd}
-          onDeleteToReserve={handleDeleteToReserve}
         />
 
         <Card 
