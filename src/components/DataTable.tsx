@@ -1383,6 +1383,151 @@ export const DataTable = () => {
         <Card 
           className="w-72 shrink-0 overflow-hidden transition-colors"
           style={{ 
+            boxShadow: isOverOtherJobs ? '0 0 0 3px hsl(var(--accent))' : undefined,
+          }}
+          onDragOver={handleOtherJobsDragOver}
+          onDragLeave={handleOtherJobsDragLeave}
+          onDrop={handleDropToOtherJobs}
+        >
+          <div className="bg-blue-100 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon name="Briefcase" size={18} className="text-blue-700" />
+                <h2 className="text-base font-bold text-blue-700 tracking-tight">
+                  Другие работы
+                </h2>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setIsAddingToOtherJobs(true)}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-200 h-7 w-7 p-0"
+              >
+                <Icon name="UserPlus" size={14} />
+              </Button>
+            </div>
+
+            {isAddingToOtherJobs && (
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Введите фамилию..."
+                  value={newOtherJobsName}
+                  onChange={(e) => setNewOtherJobsName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddToOtherJobs();
+                    if (e.key === 'Escape') {
+                      setIsAddingToOtherJobs(false);
+                      setNewOtherJobsName('');
+                    }
+                  }}
+                  className="flex-1 h-8 text-sm bg-white border-blue-300"
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAddToOtherJobs}
+                  className="bg-blue-500 hover:bg-blue-600 text-white h-8 w-8 p-0"
+                >
+                  <Icon name="Check" size={14} />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddingToOtherJobs(false);
+                    setNewOtherJobsName('');
+                  }}
+                  className="border-blue-300 h-8 w-8 p-0"
+                >
+                  <Icon name="X" size={14} />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
+            {filteredOtherJobs.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="BriefcaseX" size={32} className="mx-auto mb-3 opacity-20" />
+                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
+                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              </div>
+            ) : (
+              filteredOtherJobs.map((item) => {
+                const linkedItem = item.linkedId ? otherJobs.find(o => o.id === item.linkedId) : null;
+                return (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={(e) => handleOtherJobsDragStart(e, item.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                      >
+                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                          {item.surname}
+                        </span>
+                      </div>
+                      {!linkedItem && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLinkItems('otherJobs', item.id);
+                          }}
+                          className={`h-7 w-7 p-0 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                          title="Связать с другой фамилией"
+                        >
+                          <Icon name="Link" size={14} className="text-muted-foreground" />
+                        </Button>
+                      )}
+                      {linkedItem && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const linkedId = item.linkedId;
+                              setOtherJobs(otherJobs.map(o => {
+                                if (o.id === item.id || o.id === linkedId) {
+                                  const { linkedId: _, ...rest } = o;
+                                  return rest;
+                                }
+                                return o;
+                              }));
+                            }}
+                            className="h-7 w-7 p-0 hover:bg-destructive/10"
+                            title="Разорвать связь"
+                          >
+                            <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                          </Button>
+                          <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
+                            <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
+                              {linkedItem.surname}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </Card>
+
+        <Card 
+          className="w-72 shrink-0 overflow-hidden transition-colors"
+          style={{ 
             boxShadow: isOverWeekend ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}
           onDragOver={handleWeekendDragOver}
@@ -1532,151 +1677,6 @@ export const DataTable = () => {
                               </div>
                             </>
                           )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </Card>
-
-        <Card 
-          className="w-72 shrink-0 overflow-hidden transition-colors"
-          style={{ 
-            boxShadow: isOverOtherJobs ? '0 0 0 3px hsl(var(--accent))' : undefined,
-          }}
-          onDragOver={handleOtherJobsDragOver}
-          onDragLeave={handleOtherJobsDragLeave}
-          onDrop={handleDropToOtherJobs}
-        >
-          <div className="bg-blue-100 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon name="Briefcase" size={18} className="text-blue-700" />
-                <h2 className="text-base font-bold text-blue-700 tracking-tight">
-                  Другие работы
-                </h2>
-              </div>
-              <Button
-                size="sm"
-                onClick={() => setIsAddingToOtherJobs(true)}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-200 h-7 w-7 p-0"
-              >
-                <Icon name="UserPlus" size={14} />
-              </Button>
-            </div>
-
-            {isAddingToOtherJobs && (
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Введите фамилию..."
-                  value={newOtherJobsName}
-                  onChange={(e) => setNewOtherJobsName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddToOtherJobs();
-                    if (e.key === 'Escape') {
-                      setIsAddingToOtherJobs(false);
-                      setNewOtherJobsName('');
-                    }
-                  }}
-                  className="flex-1 h-8 text-sm bg-white border-blue-300"
-                  autoFocus
-                />
-                <Button
-                  size="sm"
-                  onClick={handleAddToOtherJobs}
-                  className="bg-blue-500 hover:bg-blue-600 text-white h-8 w-8 p-0"
-                >
-                  <Icon name="Check" size={14} />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setIsAddingToOtherJobs(false);
-                    setNewOtherJobsName('');
-                  }}
-                  className="border-blue-300 h-8 w-8 p-0"
-                >
-                  <Icon name="X" size={14} />
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
-            {filteredOtherJobs.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Icon name="BriefcaseX" size={32} className="mx-auto mb-3 opacity-20" />
-                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
-                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
-              </div>
-            ) : (
-              filteredOtherJobs.map((item) => {
-                const linkedItem = item.linkedId ? otherJobs.find(o => o.id === item.linkedId) : null;
-                return (
-                  <div
-                    key={item.id}
-                    draggable
-                    onDragStart={(e) => handleOtherJobsDragStart(e, item.id)}
-                    onDragEnd={handleDragEnd}
-                    className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
-                      >
-                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
-                          {item.surname}
-                        </span>
-                      </div>
-                      {!linkedItem && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLinkItems('otherJobs', item.id);
-                          }}
-                          className={`h-7 w-7 p-0 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
-                          title="Связать с другой фамилией"
-                        >
-                          <Icon name="Link" size={14} className="text-muted-foreground" />
-                        </Button>
-                      )}
-                      {linkedItem && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const linkedId = item.linkedId;
-                              setOtherJobs(otherJobs.map(o => {
-                                if (o.id === item.id || o.id === linkedId) {
-                                  const { linkedId: _, ...rest } = o;
-                                  return rest;
-                                }
-                                return o;
-                              }));
-                            }}
-                            className="h-7 w-7 p-0 hover:bg-destructive/10"
-                            title="Разорвать связь"
-                          >
-                            <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
-                          </Button>
-                          <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
-                            <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
-                              {linkedItem.surname}
-                            </span>
-                          </div>
                         </>
                       )}
                     </div>
