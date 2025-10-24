@@ -494,13 +494,13 @@ export const DataTable = () => {
     return generated;
   });
   
-  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string}>>([
-    { id: 'r1', surname: 'Алексеев', color: 'purple' },
-    { id: 'r2', surname: 'Новиков', color: 'pink', linkedId: 'r3' },
-    { id: 'r3', surname: 'Морозов', color: 'green', linkedId: 'r2' },
+  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
+    { id: 'r1', surname: 'Алексеев', color: 'purple', counter: 0 },
+    { id: 'r2', surname: 'Новиков', color: 'pink', linkedId: 'r3', counter: 0 },
+    { id: 'r3', surname: 'Морозов', color: 'green', linkedId: 'r2', counter: 0 },
   ]);
 
-  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string}>>([]);
+  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; counter?: number}>>([]);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
@@ -621,13 +621,15 @@ export const DataTable = () => {
     if (draggedRow) {
       if (draggedFromSecond && draggedRow.surname2) {
         const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
-        setWeekend([...weekend, { id: newWeekendId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green' }]);
+        setWeekend([...weekend.filter(w => w.surname !== draggedRow.surname2), { id: newWeekendId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', counter: 0 }]);
+        setReserve(reserve.filter(r => r.surname !== draggedRow.surname2));
         
         setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
         setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green' } : row));
       } else if (draggedRow.surname) {
         const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
-        setWeekend([...weekend, { id: newWeekendId, surname: draggedRow.surname, color: draggedRow.color }]);
+        setWeekend([...weekend.filter(w => w.surname !== draggedRow.surname), { id: newWeekendId, surname: draggedRow.surname, color: draggedRow.color, counter: 0 }]);
+        setReserve(reserve.filter(r => r.surname !== draggedRow.surname));
         
         setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
         setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '' } : row));
@@ -655,7 +657,7 @@ export const DataTable = () => {
     if (!newReserveName.trim()) return;
     
     const newId = `r${Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0) + 1}`;
-    setReserve([...reserve, { id: newId, surname: newReserveName.trim(), color: 'blue' }]);
+    setReserve([...reserve, { id: newId, surname: newReserveName.trim(), color: 'blue', counter: 0 }]);
     setNewReserveName('');
     setIsAddingToReserve(false);
   };
@@ -664,7 +666,7 @@ export const DataTable = () => {
     if (!newWeekendName.trim()) return;
     
     const newId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
-    setWeekend([...weekend, { id: newId, surname: newWeekendName.trim(), color: 'blue' }]);
+    setWeekend([...weekend, { id: newId, surname: newWeekendName.trim(), color: 'blue', counter: 0 }]);
     setNewWeekendName('');
     setIsAddingToWeekend(false);
   };
@@ -698,14 +700,26 @@ export const DataTable = () => {
     if (surname2) {
       const newId1 = `r${maxId + 1}`;
       const newId2 = `r${maxId + 2}`;
+      
+      const existing1 = reserve.find(r => r.surname === surname);
+      const existing2 = reserve.find(r => r.surname === surname2);
+      const counter1 = existing1 ? Math.min((existing1.counter || 0) + 1, 9) : 1;
+      const counter2 = existing2 ? Math.min((existing2.counter || 0) + 1, 9) : 1;
+      
       setReserve([
-        ...reserve, 
-        { id: newId1, surname, color, linkedId: newId2 },
-        { id: newId2, surname: surname2, color: color2 || 'green', linkedId: newId1 }
+        ...reserve.filter(r => r.surname !== surname && r.surname !== surname2), 
+        { id: newId1, surname, color, linkedId: newId2, counter: counter1 },
+        { id: newId2, surname: surname2, color: color2 || 'green', linkedId: newId1, counter: counter2 }
       ]);
     } else {
       const newId = `r${maxId + 1}`;
-      setReserve([...reserve, { id: newId, surname, color }]);
+      const existing = reserve.find(r => r.surname === surname);
+      const counter = existing ? Math.min((existing.counter || 0) + 1, 9) : 1;
+      
+      setReserve([
+        ...reserve.filter(r => r.surname !== surname), 
+        { id: newId, surname, color, counter }
+      ]);
     }
   };
 
@@ -935,6 +949,7 @@ export const DataTable = () => {
                     <div className="flex items-center gap-2">
                       <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1`}>
                         <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground font-mono mr-1">{item.counter || 0}</span>
                         <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
                           {item.surname}
                         </span>
@@ -954,6 +969,7 @@ export const DataTable = () => {
                             <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
                           </Button>
                           <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
+                            <span className="text-xs text-muted-foreground font-mono mr-1">{linkedItem.counter || 0}</span>
                             <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
                               {linkedItem.surname}
                             </span>
@@ -1070,6 +1086,7 @@ export const DataTable = () => {
                           className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}
                         >
                           <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground font-mono mr-1">{item.counter || 0}</span>
                           <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
                             {item.surname}
                           </span>
