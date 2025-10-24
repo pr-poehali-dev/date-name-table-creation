@@ -505,16 +505,21 @@ export const DataTable = () => {
   ]);
 
   const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; counter?: number}>>([]);
+  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; counter?: number}>>([]);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
+  const [draggedFromOtherJobs, setDraggedFromOtherJobs] = useState(false);
   const [isOverReserve, setIsOverReserve] = useState(false);
   const [isOverWeekend, setIsOverWeekend] = useState(false);
+  const [isOverOtherJobs, setIsOverOtherJobs] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [newReserveName, setNewReserveName] = useState('');
   const [isAddingToReserve, setIsAddingToReserve] = useState(false);
   const [newWeekendName, setNewWeekendName] = useState('');
   const [isAddingToWeekend, setIsAddingToWeekend] = useState(false);
+  const [newOtherJobsName, setNewOtherJobsName] = useState('');
+  const [isAddingToOtherJobs, setIsAddingToOtherJobs] = useState(false);
   
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -661,15 +666,77 @@ export const DataTable = () => {
     setDraggedFromSecond(false);
   };
 
+  const handleOtherJobsDragStart = (e: React.DragEvent, id: string) => {
+    const item = otherJobs.find(o => o.id === id);
+    if (item) {
+      setDraggedItem({ surname: item.surname, color: item.color });
+      setDraggedId(id);
+      setDraggedFromOtherJobs(true);
+    }
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleOtherJobsDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setIsOverOtherJobs(true);
+  };
+
+  const handleOtherJobsDragLeave = () => {
+    setIsOverOtherJobs(false);
+  };
+
+  const handleDropToOtherJobs = (e: React.DragEvent) => {
+    e.preventDefault();
+    
+    if (!draggedId || draggedFromOtherJobs) {
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverOtherJobs(false);
+      setDraggedFromSecond(false);
+      return;
+    }
+
+    const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
+    if (draggedRow) {
+      if (draggedFromSecond && draggedRow.surname2) {
+        setSurnameCounters({...surnameCounters, [draggedRow.surname2]: 0});
+        
+        const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
+        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedRow.surname2), { id: newOtherJobsId, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', counter: 0 }]);
+        setReserve(reserve.filter(r => r.surname !== draggedRow.surname2));
+        
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname2: '', color2: 'green', counter2: 0 } : row));
+      } else if (draggedRow.surname) {
+        setSurnameCounters({...surnameCounters, [draggedRow.surname]: 0});
+        
+        const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
+        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedRow.surname), { id: newOtherJobsId, surname: draggedRow.surname, color: draggedRow.color, counter: 0 }]);
+        setReserve(reserve.filter(r => r.surname !== draggedRow.surname));
+        
+        setData1(data1.map(row => row.id === draggedId ? { ...row, surname: '', counter: 0 } : row));
+        setData2(data2.map(row => row.id === draggedId ? { ...row, surname: '', counter: 0 } : row));
+      }
+    }
+
+    setDraggedId(null);
+    setDraggedItem(null);
+    setIsOverOtherJobs(false);
+    setDraggedFromSecond(false);
+  };
+
   const handleDragEnd = () => {
     setDraggedId(null);
     setDragOverId(null);
     setDraggedItem(null);
     setDraggedFromReserve(false);
     setDraggedFromWeekend(false);
+    setDraggedFromOtherJobs(false);
     setDraggedFromSecond(false);
     setIsOverReserve(false);
     setIsOverWeekend(false);
+    setIsOverOtherJobs(false);
   };
 
   const handleAddToReserve = () => {
@@ -690,6 +757,15 @@ export const DataTable = () => {
     setIsAddingToWeekend(false);
   };
 
+  const handleAddToOtherJobs = () => {
+    if (!newOtherJobsName.trim()) return;
+    
+    const newId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
+    setOtherJobs([...otherJobs, { id: newId, surname: newOtherJobsName.trim(), color: 'blue', counter: 0 }]);
+    setNewOtherJobsName('');
+    setIsAddingToOtherJobs(false);
+  };
+
   const handleEdit = (id: string, field: string, currentValue: string) => {
     setEditingCell({ id, field });
     setEditValue(currentValue);
@@ -704,6 +780,14 @@ export const DataTable = () => {
       }
       return item;
     }));
+    
+    setOtherJobs(otherJobs.map(item => {
+      if (item.id === editingCell.id) {
+        return { ...item, [editingCell.field]: editValue };
+      }
+      return item;
+    }));
+    
     setEditingCell(null);
     setEditValue('');
   };
@@ -761,6 +845,10 @@ export const DataTable = () => {
   });
 
   const filteredWeekend = weekend.filter(item => 
+    item.surname.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredOtherJobs = otherJobs.filter(item => 
     item.surname.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -828,6 +916,18 @@ export const DataTable = () => {
           : row
       ));
       setWeekend(weekend.filter(w => w.id !== draggedId));
+    }
+
+    if (draggedFromOtherJobs && draggedItem) {
+      const draggedOtherJobsItem = otherJobs.find(o => o.id === draggedId);
+      setDataSet(dataSet.map(row => 
+        row.id === targetId 
+          ? toSecondCell 
+            ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedOtherJobsItem?.counter || 0 }
+            : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem?.counter || 0 }
+          : row
+      ));
+      setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
     }
 
     handleDragEnd();
@@ -1114,6 +1214,130 @@ export const DataTable = () => {
                           size="sm"
                           variant="ghost"
                           onClick={() => setWeekend(weekend.filter(w => w.id !== item.id))}
+                          className="h-9 w-9 p-0 hover:bg-destructive/10"
+                        >
+                          <Icon name="Trash2" size={14} className="text-muted-foreground hover:text-destructive" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+
+        <Card 
+          className="w-72 shrink-0 overflow-hidden transition-colors"
+          style={{ 
+            boxShadow: isOverOtherJobs ? '0 0 0 3px hsl(var(--accent))' : undefined,
+          }}
+          onDragOver={handleOtherJobsDragOver}
+          onDragLeave={handleOtherJobsDragLeave}
+          onDrop={handleDropToOtherJobs}
+        >
+          <div className="bg-blue-100 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon name="Briefcase" size={18} className="text-blue-700" />
+                <h2 className="text-base font-bold text-blue-700 tracking-tight">
+                  Другие работы
+                </h2>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setIsAddingToOtherJobs(true)}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-200 h-7 w-7 p-0"
+              >
+                <Icon name="UserPlus" size={14} />
+              </Button>
+            </div>
+
+            {isAddingToOtherJobs && (
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Введите фамилию..."
+                  value={newOtherJobsName}
+                  onChange={(e) => setNewOtherJobsName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddToOtherJobs();
+                    if (e.key === 'Escape') {
+                      setIsAddingToOtherJobs(false);
+                      setNewOtherJobsName('');
+                    }
+                  }}
+                  className="flex-1 h-8 text-sm bg-white border-blue-300"
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAddToOtherJobs}
+                  className="bg-blue-500 hover:bg-blue-600 text-white h-8 w-8 p-0"
+                >
+                  <Icon name="Check" size={14} />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddingToOtherJobs(false);
+                    setNewOtherJobsName('');
+                  }}
+                  className="border-blue-300 h-8 w-8 p-0"
+                >
+                  <Icon name="X" size={14} />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
+            {filteredOtherJobs.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="BriefcaseX" size={32} className="mx-auto mb-3 opacity-20" />
+                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
+                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              </div>
+            ) : (
+              filteredOtherJobs.map((item) => (
+                <div
+                  key={item.id}
+                  draggable
+                  onDragStart={(e) => handleOtherJobsDragStart(e, item.id)}
+                  onDragEnd={handleDragEnd}
+                  className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                >
+                  <div className="flex items-center gap-2">
+                    {editingCell?.id === item.id && editingCell.field === 'surname' ? (
+                      <Input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSave();
+                          if (e.key === 'Escape') handleCancel();
+                        }}
+                        className="flex-1 h-9 text-sm"
+                        autoFocus
+                      />
+                    ) : (
+                      <>
+                        <div 
+                          onClick={() => handleEdit(item.id, 'surname', item.surname)}
+                          className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}
+                        >
+                          <Icon name="GripVertical" size={14} className="text-muted-foreground" />
+                          <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                          <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                            {item.surname}
+                          </span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setOtherJobs(otherJobs.filter(o => o.id !== item.id))}
                           className="h-9 w-9 p-0 hover:bg-destructive/10"
                         >
                           <Icon name="Trash2" size={14} className="text-muted-foreground hover:text-destructive" />
