@@ -330,7 +330,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           >
                             <Icon name="GripVertical" size={14} className="text-muted-foreground" />
                             <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm flex items-center gap-1`}>
-                              <span className="text-xs text-muted-foreground font-mono">{row.counter || 0}</span>
+                              <span className={`text-xs font-mono font-bold ${(row.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 0}</span>
                               <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
                             </div>
                           </div>
@@ -343,7 +343,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             >
                               <Icon name="GripVertical" size={14} className="text-muted-foreground" />
                               <div className={`border-2 ${colorOptions.find(c => c.value === row.color2)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm flex items-center gap-1`}>
-                                <span className="text-xs text-muted-foreground font-mono">{row.counter2 || 0}</span>
+                                <span className={`text-xs font-mono font-bold ${(row.counter2 || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 0}</span>
                                 <span className={`${colorOptions.find(c => c.value === row.color2)?.text} font-semibold text-sm`}>{row.surname2}</span>
                               </div>
                             </div>
@@ -968,7 +968,7 @@ export const DataTable = () => {
                     <div className="flex items-center gap-2">
                       <div className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1`}>
                         <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground font-mono mr-1">{item.counter || 0}</span>
+                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
                         <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
                           {item.surname}
                         </span>
@@ -988,7 +988,7 @@ export const DataTable = () => {
                             <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
                           </Button>
                           <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
-                            <span className="text-xs text-muted-foreground font-mono mr-1">{linkedItem.counter || 0}</span>
+                            <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
                             <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
                               {linkedItem.surname}
                             </span>
@@ -1105,7 +1105,7 @@ export const DataTable = () => {
                           className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1`}
                         >
                           <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground font-mono mr-1">{item.counter || 0}</span>
+                          <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
                           <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
                             {item.surname}
                           </span>
