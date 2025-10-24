@@ -516,6 +516,8 @@ export const DataTable = () => {
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [draggedItem, setDraggedItem] = useState<{surname: string; color: string} | null>(null);
   const [draggedFromSecond, setDraggedFromSecond] = useState(false);
+  const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
+  const [editValue, setEditValue] = useState('');
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);
@@ -665,6 +667,29 @@ export const DataTable = () => {
     setWeekend([...weekend, { id: newId, surname: newWeekendName.trim(), color: 'blue' }]);
     setNewWeekendName('');
     setIsAddingToWeekend(false);
+  };
+
+  const handleEdit = (id: string, field: string, currentValue: string) => {
+    setEditingCell({ id, field });
+    setEditValue(currentValue);
+  };
+
+  const handleSave = () => {
+    if (!editingCell) return;
+    
+    setWeekend(weekend.map(item => {
+      if (item.id === editingCell.id) {
+        return { ...item, [editingCell.field]: editValue };
+      }
+      return item;
+    }));
+    setEditingCell(null);
+    setEditValue('');
+  };
+
+  const handleCancel = () => {
+    setEditingCell(null);
+    setEditValue('');
   };
 
   const handleDeleteToReserve = (surname: string, color: string, surname2?: string, color2?: string) => {
