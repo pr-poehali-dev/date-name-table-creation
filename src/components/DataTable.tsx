@@ -50,6 +50,7 @@ interface SingleTableProps {
   dragOverId: string | null;
   setDragOverId: (id: string | null) => void;
   onDragEnd: () => void;
+  onReturnToReserve: (surname: string, color: string, surname2?: string, color2?: string) => void;
 }
 
 const SingleTable: React.FC<SingleTableProps> = ({ 
@@ -63,7 +64,8 @@ const SingleTable: React.FC<SingleTableProps> = ({
   draggedId,
   dragOverId,
   setDragOverId,
-  onDragEnd
+  onDragEnd,
+  onReturnToReserve
 }) => {
   const timeSlots = generateTimeSlots();
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2' } | null>(null);
@@ -97,6 +99,15 @@ const SingleTable: React.FC<SingleTableProps> = ({
   };
 
   const handleDelete = (id: string) => {
+    const rowToDelete = initialData.find(r => r.id === id);
+    if (rowToDelete) {
+      if (rowToDelete.surname) {
+        onReturnToReserve(rowToDelete.surname, rowToDelete.color, rowToDelete.surname2, rowToDelete.color2);
+      } else if (rowToDelete.surname2) {
+        onReturnToReserve(rowToDelete.surname2, rowToDelete.color2 || 'green');
+      }
+    }
+    
     const updatedData = initialData.filter(r => r.id !== id);
     
     const lastRow = updatedData[updatedData.length - 1];
@@ -955,6 +966,24 @@ export const DataTable = () => {
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
           onDragEnd={handleDragEnd}
+          onReturnToReserve={(surname, color, surname2, color2) => {
+            const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
+            const newReserveItems = [];
+            
+            if (surname) {
+              const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
+              setSurnameCounters({...surnameCounters, [surname]: counter});
+              newReserveItems.push({ id: `r${maxId + 1}`, surname, color, counter });
+            }
+            
+            if (surname2) {
+              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              setSurnameCounters({...surnameCounters, [surname2]: counter});
+              newReserveItems.push({ id: `r${maxId + 2}`, surname: surname2, color: color2 || 'green', counter });
+            }
+            
+            setReserve([...reserve, ...newReserveItems]);
+          }}
         />
 
         <SingleTable 
@@ -969,6 +998,24 @@ export const DataTable = () => {
           dragOverId={dragOverId}
           setDragOverId={setDragOverId}
           onDragEnd={handleDragEnd}
+          onReturnToReserve={(surname, color, surname2, color2) => {
+            const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
+            const newReserveItems = [];
+            
+            if (surname) {
+              const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
+              setSurnameCounters({...surnameCounters, [surname]: counter});
+              newReserveItems.push({ id: `r${maxId + 1}`, surname, color, counter });
+            }
+            
+            if (surname2) {
+              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              setSurnameCounters({...surnameCounters, [surname2]: counter});
+              newReserveItems.push({ id: `r${maxId + 2}`, surname: surname2, color: color2 || 'green', counter });
+            }
+            
+            setReserve([...reserve, ...newReserveItems]);
+          }}
         />
 
         <Card 
