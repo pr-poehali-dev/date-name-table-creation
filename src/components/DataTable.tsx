@@ -100,7 +100,35 @@ const SingleTable: React.FC<SingleTableProps> = ({
     const row = initialData.find(r => r.id === id);
     if (row && row.surname.trim()) {
       onDeleteToReserve(row.surname, row.color, row.surname2, row.color2);
-      onDataChange(initialData.map(r => r.id === id ? { ...r, surname: '', color: 'blue', surname2: '', color2: 'green' } : r));
+      
+      const updatedData = initialData.filter(r => r.id !== id);
+      
+      const lastRow = updatedData[updatedData.length - 1];
+      let newTime = '09:00';
+      let newDate = new Date().toISOString().split('T')[0];
+      
+      if (lastRow) {
+        newDate = lastRow.date;
+        const lastTime = lastRow.time;
+        const [hours, minutes] = lastTime.split(':').map(Number);
+        let totalMinutes = hours * 60 + minutes + 15;
+        
+        if (totalMinutes >= 1440) {
+          totalMinutes = 0;
+          const lastDate = new Date(lastRow.date);
+          lastDate.setDate(lastDate.getDate() + 1);
+          newDate = lastDate.toISOString().split('T')[0];
+        } else {
+          newDate = lastRow.date;
+        }
+        
+        const newHours = Math.floor(totalMinutes / 60);
+        const newMinutes = totalMinutes % 60;
+        newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
+      }
+      
+      const newId = `${title}-${Date.now()}`;
+      onDataChange([...updatedData, { id: newId, date: newDate, time: newTime, surname: '', color: 'red', surname2: '', color2: 'green' }]);
     }
   };
 
