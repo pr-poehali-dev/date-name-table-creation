@@ -239,7 +239,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
   );
 
   return (
-    <Card className="flex-1 overflow-hidden">
+    <Card className="flex-1 overflow-hidden resize-x min-w-[400px] max-w-full">
       <div className="bg-primary p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-primary-foreground tracking-tight">
@@ -256,7 +256,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[calc(100vh-280px)] overflow-y-auto">
+      <div className="overflow-x-auto max-h-[calc(100vh-280px)] overflow-y-auto resize-y min-h-[300px]">
         <table className="w-full">
           <thead className="sticky top-0 z-10">
             <tr className="bg-secondary border-b border-border">
@@ -1293,7 +1293,7 @@ export const DataTable = () => {
         />
 
         <Card 
-          className="w-72 shrink-0 overflow-hidden transition-colors"
+          className="w-72 shrink-0 overflow-hidden transition-colors resize-x min-w-[250px] max-w-[600px]"
           style={{ 
             boxShadow: isOverReserve ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}
@@ -1431,7 +1431,7 @@ export const DataTable = () => {
         </Card>
 
         <Card 
-          className="w-72 shrink-0 overflow-hidden transition-colors"
+          className="w-72 shrink-0 overflow-hidden transition-colors resize-x min-w-[250px] max-w-[600px]"
           style={{ 
             boxShadow: isOverOtherJobs ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}
@@ -1576,7 +1576,7 @@ export const DataTable = () => {
         </Card>
 
         <Card 
-          className="w-72 shrink-0 overflow-hidden transition-colors"
+          className="w-72 shrink-0 overflow-hidden transition-colors resize-x min-w-[250px] max-w-[600px]"
           style={{ 
             boxShadow: isOverWeekend ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}

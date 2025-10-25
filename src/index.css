@@ -99,3 +99,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .resize-x {
+    resize: horizontal;
+    overflow: auto;
+  }
+
+  .resize-y {
+    resize: vertical;
+    overflow: auto;
+  }
+
+  .resize-x::-webkit-resizer,
+  .resize-y::-webkit-resizer {
+    background: linear-gradient(
+      135deg,
+      transparent 50%,
+      hsl(var(--accent)) 50%
+    );
+    border-radius: 0 0 4px 0;
+  }
+}
