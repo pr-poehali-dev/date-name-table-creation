@@ -309,12 +309,14 @@ const SingleTable: React.FC<SingleTableProps> = ({
                         const draggedRow = initialData.find(r => r.id === draggedId);
                         if (draggedRow) {
                           if (draggedId !== row.id) {
-                            onDataChange(initialData.map(r => {
-                              if (r.id === draggedId) {
-                                return { ...r, date: row.date, time: row.time };
-                              }
-                              return r;
-                            }));
+                            const draggedIndex = initialData.findIndex(r => r.id === draggedId);
+                            const targetIndex = initialData.findIndex(r => r.id === row.id);
+                            
+                            const newData = [...initialData];
+                            const [removed] = newData.splice(draggedIndex, 1);
+                            newData.splice(targetIndex, 0, removed);
+                            
+                            onDataChange(newData);
                           }
                         } else {
                           onDropToTable(row.id, null, false, draggedId, false);
