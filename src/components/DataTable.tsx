@@ -199,7 +199,15 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const handleDragOver = (e: React.DragEvent, id: string) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    setDragOverId(id);
+    
+    const target = e.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const height = rect.height;
+    
+    if (y < height * 0.7) {
+      setDragOverId(id);
+    }
   };
 
   const handleDragLeave = () => {
@@ -267,8 +275,8 @@ const SingleTable: React.FC<SingleTableProps> = ({
                   )}
                   <tr 
                     key={`row-${row.id}`} 
-                    className={`transition-colors ${
-                      dragOverId === row.id ? 'bg-accent/20' : 'hover:bg-muted/50'
+                    className={`transition-all duration-150 ${
+                      dragOverId === row.id ? 'bg-accent/30 scale-[1.02] shadow-md' : 'hover:bg-muted/50'
                     } ${draggedId === row.id ? 'opacity-50' : ''}`}
                     onDragOver={(e) => handleDragOver(e, row.id)}
                     onDragLeave={handleDragLeave}
@@ -539,37 +547,6 @@ export const DataTable = () => {
       setDraggedItem({ surname: item.surname, color: item.color });
       setDraggedId(id);
       setDraggedFromReserve(true);
-      
-      if (item.linkedId) {
-        const linkedItem = reserve.find(r => r.id === item.linkedId);
-        if (linkedItem) {
-          const dragPreview = document.createElement('div');
-          dragPreview.style.position = 'absolute';
-          dragPreview.style.top = '-1000px';
-          dragPreview.style.display = 'flex';
-          dragPreview.style.gap = '8px';
-          dragPreview.style.padding = '8px';
-          dragPreview.style.background = 'white';
-          dragPreview.style.borderRadius = '8px';
-          dragPreview.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-          
-          const colorClass1 = colorOptions.find(c => c.value === item.color);
-          const colorClass2 = colorOptions.find(c => c.value === linkedItem.color);
-          
-          dragPreview.innerHTML = `
-            <div style="border: 2px solid ${colorClass1?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass1?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
-              <span style="font-weight: 600; font-size: 14px;">${item.surname}</span>
-            </div>
-            <div style="border: 2px solid ${colorClass2?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass2?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
-              <span style="font-weight: 600; font-size: 14px;">${linkedItem.surname}</span>
-            </div>
-          `;
-          
-          document.body.appendChild(dragPreview);
-          e.dataTransfer.setDragImage(dragPreview, 0, 0);
-          setTimeout(() => document.body.removeChild(dragPreview), 0);
-        }
-      }
     }
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -647,28 +624,8 @@ export const DataTable = () => {
       setDraggedItem({ surname: item.surname, color: item.color });
       setDraggedId(id);
       setDraggedFromWeekend(true);
-      
-      if (item.linkedId) {
-        const linkedItem = weekend.find(w => w.id === item.linkedId);
-        if (linkedItem) {
-          const dragPreview = document.createElement('div');
-          dragPreview.style.position = 'absolute';
-          dragPreview.style.top = '-1000px';
-          dragPreview.style.display = 'flex';
-          dragPreview.style.gap = '8px';
-          dragPreview.style.padding = '8px';
-          dragPreview.style.background = 'white';
-          dragPreview.style.borderRadius = '8px';
-          dragPreview.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-          
-          const colorClass1 = colorOptions.find(c => c.value === item.color);
-          const colorClass2 = colorOptions.find(c => c.value === linkedItem.color);
-          
-          dragPreview.innerHTML = `
-            <div style="border: 2px solid ${colorClass1?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass1?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
-              <span style="font-weight: 600; font-size: 14px;">${item.surname}</span>
-            </div>
-            <div style="border: 2px solid ${colorClass2?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass2?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
+    }
+    e.dataTransfer.effectAllowed = 'move';
               <span style="font-weight: 600; font-size: 14px;">${linkedItem.surname}</span>
             </div>
           `;
@@ -749,37 +706,6 @@ export const DataTable = () => {
       setDraggedItem({ surname: item.surname, color: item.color });
       setDraggedId(id);
       setDraggedFromOtherJobs(true);
-      
-      if (item.linkedId) {
-        const linkedItem = otherJobs.find(o => o.id === item.linkedId);
-        if (linkedItem) {
-          const dragPreview = document.createElement('div');
-          dragPreview.style.position = 'absolute';
-          dragPreview.style.top = '-1000px';
-          dragPreview.style.display = 'flex';
-          dragPreview.style.gap = '8px';
-          dragPreview.style.padding = '8px';
-          dragPreview.style.background = 'white';
-          dragPreview.style.borderRadius = '8px';
-          dragPreview.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-          
-          const colorClass1 = colorOptions.find(c => c.value === item.color);
-          const colorClass2 = colorOptions.find(c => c.value === linkedItem.color);
-          
-          dragPreview.innerHTML = `
-            <div style="border: 2px solid ${colorClass1?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass1?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
-              <span style="font-weight: 600; font-size: 14px;">${item.surname}</span>
-            </div>
-            <div style="border: 2px solid ${colorClass2?.border.replace('border-', '')}; border-radius: 6px; padding: 8px 12px; background: ${colorClass2?.bg.replace('bg-', '')}; display: flex; align-items: center; gap: 4px;">
-              <span style="font-weight: 600; font-size: 14px;">${linkedItem.surname}</span>
-            </div>
-          `;
-          
-          document.body.appendChild(dragPreview);
-          e.dataTransfer.setDragImage(dragPreview, 0, 0);
-          setTimeout(() => document.body.removeChild(dragPreview), 0);
-        }
-      }
     }
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -1241,9 +1167,10 @@ export const DataTable = () => {
         />
 
         <Card 
-          className="w-52 shrink-0 overflow-hidden transition-colors resize-x min-w-[180px] max-w-[400px]"
+          className="w-52 shrink-0 overflow-hidden transition-all duration-200 resize-x min-w-[180px] max-w-[400px]"
           style={{ 
-            boxShadow: isOverReserve ? '0 0 0 3px hsl(var(--accent))' : undefined,
+            boxShadow: isOverReserve ? '0 0 0 4px hsl(var(--accent))' : undefined,
+            transform: isOverReserve ? 'scale(1.02)' : undefined,
           }}
           onDragOver={handleReserveDragOver}
           onDragLeave={handleReserveDragLeave}
@@ -1326,11 +1253,11 @@ export const DataTable = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div 
-                        className={`border ${colorOptions.find(c => c.value === item.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-0.5 flex-1 ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-1 ring-accent' : ''}`}
+                        className={`border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 flex-1 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                       >
                         <Icon name="GripVertical" size={10} className="text-muted-foreground" />
                         <span className={`text-[9px] font-mono font-bold mr-0.5 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-[11px]`}>
+                        <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
                           {item.surname}
                         </span>
                       </div>
@@ -1362,9 +1289,9 @@ export const DataTable = () => {
                           >
                             <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
-                          <div className={`border ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-0.5`}>
+                          <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
                             <span className={`text-[9px] font-mono font-bold mr-0.5 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-[11px]`}>
+                            <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
                               {linkedItem.surname}
                             </span>
                           </div>
@@ -1379,9 +1306,10 @@ export const DataTable = () => {
         </Card>
 
         <Card 
-          className="w-52 shrink-0 overflow-hidden transition-colors resize-x min-w-[180px] max-w-[400px]"
+          className="w-52 shrink-0 overflow-hidden transition-all duration-200 resize-x min-w-[180px] max-w-[400px]"
           style={{ 
-            boxShadow: isOverOtherJobs ? '0 0 0 3px hsl(var(--accent))' : undefined,
+            boxShadow: isOverOtherJobs ? '0 0 0 4px hsl(var(--accent))' : undefined,
+            transform: isOverOtherJobs ? 'scale(1.02)' : undefined,
           }}
           onDragOver={handleOtherJobsDragOver}
           onDragLeave={handleOtherJobsDragLeave}
@@ -1464,11 +1392,11 @@ export const DataTable = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div 
-                        className={`flex-1 border ${colorOptions.find(c => c.value === item.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-0.5 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                        className={`flex-1 border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                       >
                         <Icon name="GripVertical" size={10} className="text-muted-foreground" />
                         <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-[11px]`}>
+                        <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
                           {item.surname}
                         </span>
                       </div>
@@ -1507,9 +1435,9 @@ export const DataTable = () => {
                           >
                             <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
-                          <div className={`border ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-0.5`}>
+                          <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
                             <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-[11px]`}>
+                            <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
                               {linkedItem.surname}
                             </span>
                           </div>
@@ -1524,9 +1452,10 @@ export const DataTable = () => {
         </Card>
 
         <Card 
-          className="w-52 shrink-0 overflow-hidden transition-colors resize-x min-w-[180px] max-w-[400px]"
+          className="w-52 shrink-0 overflow-hidden transition-all duration-200 resize-x min-w-[180px] max-w-[400px]"
           style={{ 
-            boxShadow: isOverWeekend ? '0 0 0 3px hsl(var(--accent))' : undefined,
+            boxShadow: isOverWeekend ? '0 0 0 4px hsl(var(--accent))' : undefined,
+            transform: isOverWeekend ? 'scale(1.02)' : undefined,
           }}
           onDragOver={handleWeekendDragOver}
           onDragLeave={handleWeekendDragLeave}
@@ -1624,11 +1553,11 @@ export const DataTable = () => {
                         <>
                           <div 
                             onClick={() => handleEdit(item.id, 'surname', item.surname)}
-                            className={`flex-1 border ${colorOptions.find(c => c.value === item.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-0.5 ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                            className={`flex-1 border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                           >
                             <Icon name="GripVertical" size={10} className="text-muted-foreground" />
                             <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                            <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-[11px]`}>
+                            <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
                               {item.surname}
                             </span>
                           </div>
@@ -1667,9 +1596,9 @@ export const DataTable = () => {
                               >
                                 <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                               </Button>
-                              <div className={`border ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-0.5`}>
+                              <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
                                 <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                                <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-[11px]`}>
+                                <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
                                   {linkedItem.surname}
                                 </span>
                               </div>
