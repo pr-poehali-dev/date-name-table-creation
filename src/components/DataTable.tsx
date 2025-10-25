@@ -307,13 +307,15 @@ const SingleTable: React.FC<SingleTableProps> = ({
                       e.preventDefault();
                       if (draggedId) {
                         const draggedRow = initialData.find(r => r.id === draggedId);
-                        if (draggedRow && draggedId !== row.id) {
-                          onDataChange(initialData.map(r => {
-                            if (r.id === draggedId) {
-                              return { ...r, date: row.date, time: row.time };
-                            }
-                            return r;
-                          }));
+                        if (draggedRow) {
+                          if (draggedId !== row.id) {
+                            onDataChange(initialData.map(r => {
+                              if (r.id === draggedId) {
+                                return { ...r, date: row.date, time: row.time };
+                              }
+                              return r;
+                            }));
+                          }
                         } else {
                           onDropToTable(row.id, null, false, draggedId, false);
                         }
