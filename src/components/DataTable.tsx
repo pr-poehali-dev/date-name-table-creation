@@ -1558,104 +1558,6 @@ export const DataTable = () => {
         <Card 
           className="w-52 shrink-0 overflow-hidden transition-all duration-200 resize-x min-w-[180px] max-w-[400px]"
           style={{ 
-            boxShadow: isOverOtherJobs ? '0 0 0 4px hsl(var(--accent))' : undefined,
-            transform: isOverOtherJobs ? 'scale(1.02)' : undefined,
-          }}
-          onDragOver={handleOtherJobsDragOver}
-          onDragLeave={handleOtherJobsDragLeave}
-          onDrop={handleDropToOtherJobs}
-        >
-          <div className="bg-blue-100 p-2 space-y-2">
-            <div className="flex items-center gap-2">
-              <Icon name="Briefcase" size={14} className="text-blue-700" />
-              <h2 className="text-xs font-bold text-blue-700 tracking-tight">
-                Другие работы
-              </h2>
-            </div>
-          </div>
-
-          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
-            {filteredOtherJobs.length === 0 ? (
-              <div className="text-center py-4 text-muted-foreground">
-                <Icon name="BriefcaseX" size={20} className="mx-auto mb-2 opacity-20" />
-                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
-                <p className="text-[10px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
-              </div>
-            ) : (
-              filteredOtherJobs.map((item) => {
-                const linkedItem = item.linkedId ? otherJobs.find(o => o.id === item.linkedId) : null;
-                return (
-                  <div
-                    key={item.id}
-                    draggable
-                    onDragStart={(e) => handleOtherJobsDragStart(e, item.id)}
-                    onDragEnd={handleDragEnd}
-                    className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className={`flex-1 border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
-                      >
-                        <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                        <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                        <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
-                          {item.surname}
-                        </span>
-                      </div>
-                      {!linkedItem && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLinkItems('otherJobs', item.id);
-                          }}
-                          className={`h-5 w-5 p-0 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
-                          title="Связать с другой фамилией"
-                        >
-                          <Icon name="Link" size={10} className="text-muted-foreground" />
-                        </Button>
-                      )}
-                      {linkedItem && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const linkedId = item.linkedId;
-                              setOtherJobs(otherJobs.map(o => {
-                                if (o.id === item.id || o.id === linkedId) {
-                                  const { linkedId: _, ...rest } = o;
-                                  return rest;
-                                }
-                                return o;
-                              }));
-                            }}
-                            className="h-5 w-5 p-0 hover:bg-destructive/10"
-                            title="Разорвать связь"
-                          >
-                            <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
-                          </Button>
-                          <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
-                            <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                            <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
-                              {linkedItem.surname}
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </Card>
-
-        <Card 
-          className="w-52 shrink-0 overflow-hidden transition-all duration-200 resize-x min-w-[180px] max-w-[400px]"
-          style={{ 
             boxShadow: isOverWeekend ? '0 0 0 4px hsl(var(--accent))' : undefined,
             transform: isOverWeekend ? 'scale(1.02)' : undefined,
           }}
@@ -1825,6 +1727,104 @@ export const DataTable = () => {
                               </div>
                             </>
                           )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </Card>
+
+        <Card 
+          className="w-52 shrink-0 overflow-hidden transition-all duration-200 resize-x min-w-[180px] max-w-[400px]"
+          style={{ 
+            boxShadow: isOverOtherJobs ? '0 0 0 4px hsl(var(--accent))' : undefined,
+            transform: isOverOtherJobs ? 'scale(1.02)' : undefined,
+          }}
+          onDragOver={handleOtherJobsDragOver}
+          onDragLeave={handleOtherJobsDragLeave}
+          onDrop={handleDropToOtherJobs}
+        >
+          <div className="bg-blue-100 p-2 space-y-2">
+            <div className="flex items-center gap-2">
+              <Icon name="Briefcase" size={14} className="text-blue-700" />
+              <h2 className="text-xs font-bold text-blue-700 tracking-tight">
+                Другие работы
+              </h2>
+            </div>
+          </div>
+
+          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
+            {filteredOtherJobs.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground">
+                <Icon name="BriefcaseX" size={20} className="mx-auto mb-2 opacity-20" />
+                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
+                <p className="text-[10px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              </div>
+            ) : (
+              filteredOtherJobs.map((item) => {
+                const linkedItem = item.linkedId ? otherJobs.find(o => o.id === item.linkedId) : null;
+                return (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={(e) => handleOtherJobsDragStart(e, item.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`transition-all ${draggedId === item.id ? 'opacity-50' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className={`flex-1 border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
+                      >
+                        <Icon name="GripVertical" size={10} className="text-muted-foreground" />
+                        <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
+                          {item.surname}
+                        </span>
+                      </div>
+                      {!linkedItem && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLinkItems('otherJobs', item.id);
+                          }}
+                          className={`h-5 w-5 p-0 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                          title="Связать с другой фамилией"
+                        >
+                          <Icon name="Link" size={10} className="text-muted-foreground" />
+                        </Button>
+                      )}
+                      {linkedItem && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const linkedId = item.linkedId;
+                              setOtherJobs(otherJobs.map(o => {
+                                if (o.id === item.id || o.id === linkedId) {
+                                  const { linkedId: _, ...rest } = o;
+                                  return rest;
+                                }
+                                return o;
+                              }));
+                            }}
+                            className="h-5 w-5 p-0 hover:bg-destructive/10"
+                            title="Разорвать связь"
+                          >
+                            <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
+                          </Button>
+                          <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
+                            <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                            <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
+                              {linkedItem.surname}
+                            </span>
+                          </div>
                         </>
                       )}
                     </div>
