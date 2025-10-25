@@ -239,37 +239,37 @@ const SingleTable: React.FC<SingleTableProps> = ({
   );
 
   return (
-    <Card className="flex-1 overflow-hidden resize-x min-w-[400px] max-w-full">
-      <div className="bg-primary p-4">
+    <Card className="flex-1 overflow-hidden resize-x min-w-[300px] max-w-full">
+      <div className="bg-primary p-2">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-primary-foreground tracking-tight">
+          <h1 className="text-sm font-bold text-primary-foreground tracking-tight">
             {title}
           </h1>
           <Button 
             onClick={handleAdd}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground h-8 text-sm"
+            className="bg-accent hover:bg-accent/90 text-accent-foreground h-6 text-xs"
             size="sm"
           >
-            <Icon name="Plus" size={14} className="mr-1" />
+            <Icon name="Plus" size={12} className="mr-1" />
             Добавить
           </Button>
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[calc(100vh-280px)] overflow-y-auto resize-y min-h-[300px]">
+      <div className="overflow-x-auto max-h-[calc(100vh-180px)] overflow-y-auto resize-y min-h-[200px]">
         <table className="w-full">
           <thead className="sticky top-0 z-10">
             <tr className="bg-secondary border-b border-border">
-              <th className="px-4 py-3 text-left text-xs font-semibold text-secondary-foreground uppercase tracking-wider">
+              <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider">
                 Время
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-secondary-foreground uppercase tracking-wider">
+              <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider">
                 Фамилия
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-secondary-foreground uppercase tracking-wider">
+              <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider">
                 Цвет
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-secondary-foreground uppercase tracking-wider w-24">
+              <th className="px-2 py-1.5 text-center text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider w-16">
                 Действия
               </th>
             </tr>
@@ -281,11 +281,11 @@ const SingleTable: React.FC<SingleTableProps> = ({
               return (
                 <React.Fragment key={`fragment-${row.id}`}>
                   {isNewDay && (
-                    <tr key={`date-${row.date}-${index}`} className="sticky top-12 z-10">
-                      <td colSpan={4} className="bg-secondary px-4 py-2">
-                        <div className="flex items-center gap-2">
-                          <Icon name="Calendar" size={16} className="text-secondary-foreground" />
-                          <span className="font-semibold text-xs text-secondary-foreground">
+                    <tr key={`date-${row.date}-${index}`} className="sticky top-8 z-10">
+                      <td colSpan={4} className="bg-secondary px-2 py-1">
+                        <div className="flex items-center gap-1.5">
+                          <Icon name="Calendar" size={12} className="text-secondary-foreground" />
+                          <span className="font-semibold text-[10px] text-secondary-foreground">
                             {new Date(row.date).toLocaleDateString('ru-RU', { 
                               weekday: 'short', 
                               month: 'short', 
@@ -319,10 +319,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
                       onDragEnd();
                     }}
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-2 py-1.5">
                       {editingCell?.id === row.id && editingCell.field === 'time' ? (
                         <Select value={editValue} onValueChange={setEditValue}>
-                          <SelectTrigger className="max-w-xs">
+                          <SelectTrigger className="max-w-xs h-6 text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -334,12 +334,12 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="text-foreground font-mono text-sm">
+                        <div className="text-foreground font-mono text-[11px]">
                           {row.time}
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-1.5">
                       {editingCell?.id === row.id && editingCell.field === 'surname' ? (
                         <Input
                           type="text"
@@ -372,10 +372,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             onDragEnd={onDragEnd}
                             className="cursor-move transition-colors font-medium flex items-center gap-1"
                           >
-                            <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                            <div className={`border-2 ${colorOptions.find(c => c.value === row.color)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm flex items-center gap-1 ${linkedRows.has(row.id) && row.surname2 ? 'ring-2 ring-accent' : ''}`}>
-                              <span className={`text-xs font-mono font-bold ${(row.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 0}</span>
-                              <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-sm`}>{row.surname || '—'}</span>
+                            <Icon name="GripVertical" size={10} className="text-muted-foreground" />
+                            <div className={`border ${colorOptions.find(c => c.value === row.color)?.border} rounded px-2 py-0.5 ${colorOptions.find(c => c.value === row.color)?.bg} ${colorOptions.find(c => c.value === row.color)?.hover} transition-colors shadow-sm flex items-center gap-0.5 ${linkedRows.has(row.id) && row.surname2 ? 'ring-1 ring-accent' : ''}`}>
+                              <span className={`text-[9px] font-mono font-bold ${(row.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 0}</span>
+                              <span className={`${colorOptions.find(c => c.value === row.color)?.text} font-semibold text-[11px]`}>{row.surname || '—'}</span>
                             </div>
                           </div>
                           {row.surname && row.surname2 && (
@@ -383,10 +383,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               size="sm"
                               variant="ghost"
                               onClick={() => handleToggleLink(row.id)}
-                              className={`h-7 w-7 p-0 ${linkedRows.has(row.id) ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                              className={`h-5 w-5 p-0 ${linkedRows.has(row.id) ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
                               title={linkedRows.has(row.id) ? "Разорвать связь" : "Связать фамилии"}
                             >
-                              <Icon name={linkedRows.has(row.id) ? "Unlink" : "Link"} size={14} className="text-muted-foreground" />
+                              <Icon name={linkedRows.has(row.id) ? "Unlink" : "Link"} size={10} className="text-muted-foreground" />
                             </Button>
                           )}
                           {row.surname2 ? (
@@ -396,10 +396,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               onDragEnd={onDragEnd}
                               className="cursor-move transition-colors font-medium flex items-center gap-1"
                             >
-                              <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                              <div className={`border-2 ${colorOptions.find(c => c.value === row.color2)?.border} rounded-lg px-3 py-1 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm flex items-center gap-1 ${linkedRows.has(row.id) ? 'ring-2 ring-accent' : ''}`}>
-                                <span className={`text-xs font-mono font-bold ${(row.counter2 || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 0}</span>
-                                <span className={`${colorOptions.find(c => c.value === row.color2)?.text} font-semibold text-sm`}>{row.surname2}</span>
+                              <Icon name="GripVertical" size={10} className="text-muted-foreground" />
+                              <div className={`border ${colorOptions.find(c => c.value === row.color2)?.border} rounded px-2 py-0.5 ${colorOptions.find(c => c.value === row.color2)?.bg} ${colorOptions.find(c => c.value === row.color2)?.hover} transition-colors shadow-sm flex items-center gap-0.5 ${linkedRows.has(row.id) ? 'ring-1 ring-accent' : ''}`}>
+                                <span className={`text-[9px] font-mono font-bold ${(row.counter2 || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 0}</span>
+                                <span className={`${colorOptions.find(c => c.value === row.color2)?.text} font-semibold text-[11px]`}>{row.surname2}</span>
                               </div>
                             </div>
                           ) : (
@@ -429,15 +429,15 @@ const SingleTable: React.FC<SingleTableProps> = ({
                                 dragOverSecondCell === row.id 
                                   ? 'border-accent bg-accent/20' 
                                   : 'border-dashed border-gray-300 bg-gray-50'
-                              } rounded-lg px-3 py-1 hover:bg-gray-100 transition-all shadow-sm`}>
-                                <span className="text-gray-400 font-semibold text-sm">+</span>
+                              } rounded px-2 py-0.5 hover:bg-gray-100 transition-all shadow-sm`}>
+                                <span className="text-gray-400 font-semibold text-[11px]">+</span>
                               </div>
                             </div>
                           )}
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-1.5">
                       {editingCell?.id === row.id && editingCell.field === 'color' ? (
                         <Select value={editValue} onValueChange={setEditValue}>
                           <SelectTrigger className="max-w-xs">
@@ -459,29 +459,29 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           onClick={() => handleEdit(row.id, 'color', row.color)}
                           className="cursor-pointer flex items-center gap-1"
                         >
-                          <div className={`w-5 h-5 rounded border-2 ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
-                          <span className="text-xs text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
+                          <div className={`w-4 h-4 rounded border ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
+                          <span className="text-[10px] text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-1.5">
                       <div className="flex items-center justify-center gap-1">
                         {editingCell?.id === row.id ? (
                           <>
                             <Button
                               size="sm"
                               onClick={handleSave}
-                              className="bg-accent hover:bg-accent/90 text-accent-foreground h-7 w-7 p-0"
+                              className="bg-accent hover:bg-accent/90 text-accent-foreground h-5 w-5 p-0"
                             >
-                              <Icon name="Check" size={14} />
+                              <Icon name="Check" size={10} />
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={handleCancel}
-                              className="h-7 w-7 p-0"
+                              className="h-5 w-5 p-0"
                             >
-                              <Icon name="X" size={14} />
+                              <Icon name="X" size={10} />
                             </Button>
                           </>
                         ) : (
@@ -489,9 +489,9 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             size="sm"
                             variant="destructive"
                             onClick={() => handleDelete(row.id)}
-                            className="h-7 w-7 p-0"
+                            className="h-5 w-5 p-0"
                           >
-                            <Icon name="Trash2" size={14} />
+                            <Icon name="Trash2" size={10} />
                           </Button>
                         )}
                       </div>
@@ -1195,23 +1195,23 @@ export const DataTable = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-background p-4">
-      <div className="max-w-[1800px] mx-auto mb-4">
-        <div className="bg-primary p-4 rounded-lg">
+    <div className="w-full min-h-screen bg-background p-2">
+      <div className="max-w-[1800px] mx-auto mb-2">
+        <div className="bg-primary p-2 rounded">
           <div className="relative max-w-md">
-            <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-foreground/60" />
+            <Icon name="Search" size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-primary-foreground/60" />
             <Input
               type="text"
               placeholder="Поиск по фамилии..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 text-sm bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
+              className="pl-8 h-6 text-xs bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
             />
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto flex gap-4">
+      <div className="max-w-[1800px] mx-auto flex gap-2">
         <SingleTable 
           title="ТАБЛИЦА 1"
           initialData={data1}
@@ -1293,7 +1293,7 @@ export const DataTable = () => {
         />
 
         <Card 
-          className="w-72 shrink-0 overflow-hidden transition-colors resize-x min-w-[250px] max-w-[600px]"
+          className="w-52 shrink-0 overflow-hidden transition-colors resize-x min-w-[180px] max-w-[400px]"
           style={{ 
             boxShadow: isOverReserve ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}
@@ -1301,11 +1301,11 @@ export const DataTable = () => {
           onDragLeave={handleReserveDragLeave}
           onDrop={handleDropToReserve}
         >
-          <div className="bg-secondary p-4 space-y-3">
+          <div className="bg-secondary p-2 space-y-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon name="Users" size={18} className="text-secondary-foreground" />
-                <h2 className="text-base font-bold text-secondary-foreground tracking-tight">
+              <div className="flex items-center gap-1.5">
+                <Icon name="Users" size={14} className="text-secondary-foreground" />
+                <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
                   Резерв
                 </h2>
               </div>
@@ -1313,9 +1313,9 @@ export const DataTable = () => {
                 size="sm"
                 onClick={() => setIsAddingToReserve(true)}
                 variant="outline"
-                className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10 h-7 w-7 p-0"
+                className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10 h-5 w-5 p-0"
               >
-                <Icon name="UserPlus" size={14} />
+                <Icon name="UserPlus" size={10} />
               </Button>
             </div>
 
@@ -1333,15 +1333,15 @@ export const DataTable = () => {
                       setNewReserveName('');
                     }
                   }}
-                  className="flex-1 h-8 text-sm bg-secondary-foreground/10 border-secondary-foreground/20"
+                  className="flex-1 h-6 text-xs bg-secondary-foreground/10 border-secondary-foreground/20"
                   autoFocus
                 />
                 <Button
                   size="sm"
                   onClick={handleAddToReserve}
-                  className="bg-accent hover:bg-accent/90 h-8 w-8 p-0"
+                  className="bg-accent hover:bg-accent/90 h-6 w-6 p-0"
                 >
-                  <Icon name="Check" size={14} />
+                  <Icon name="Check" size={10} />
                 </Button>
                 <Button
                   size="sm"
@@ -1350,20 +1350,20 @@ export const DataTable = () => {
                     setIsAddingToReserve(false);
                     setNewReserveName('');
                   }}
-                  className="border-secondary-foreground/20 h-8 w-8 p-0"
+                  className="border-secondary-foreground/20 h-6 w-6 p-0"
                 >
-                  <Icon name="X" size={14} />
+                  <Icon name="X" size={10} />
                 </Button>
               </div>
             )}
           </div>
 
-          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
+          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
             {filteredReserve.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Icon name="UserX" size={32} className="mx-auto mb-3 opacity-20" />
-                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
-                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              <div className="text-center py-4 text-muted-foreground">
+                <Icon name="UserX" size={20} className="mx-auto mb-2 opacity-20" />
+                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
+                <p className="text-[10px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
               filteredReserve.map((item) => {
@@ -1378,11 +1378,11 @@ export const DataTable = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div 
-                        className={`border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 flex-1 ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                        className={`border ${colorOptions.find(c => c.value === item.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-0.5 flex-1 ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-1 ring-accent' : ''}`}
                       >
-                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                        <Icon name="GripVertical" size={10} className="text-muted-foreground" />
+                        <span className={`text-[9px] font-mono font-bold mr-0.5 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-[11px]`}>
                           {item.surname}
                         </span>
                       </div>
@@ -1394,10 +1394,10 @@ export const DataTable = () => {
                             e.stopPropagation();
                             handleLinkItems('reserve', item.id);
                           }}
-                          className={`h-7 w-7 p-0 ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                          className={`h-5 w-5 p-0 ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
                           title="Связать с другой фамилией"
                         >
-                          <Icon name="Link" size={14} className="text-muted-foreground" />
+                          <Icon name="Link" size={10} className="text-muted-foreground" />
                         </Button>
                       )}
                       {linkedItem && (
@@ -1409,14 +1409,14 @@ export const DataTable = () => {
                               e.stopPropagation();
                               handleUnlinkReserve(item.id);
                             }}
-                            className="h-7 w-7 p-0 hover:bg-destructive/10"
+                            className="h-5 w-5 p-0 hover:bg-destructive/10"
                             title="Разорвать связь"
                           >
-                            <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                            <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
-                          <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
-                            <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
+                          <div className={`border ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-0.5`}>
+                            <span className={`text-[9px] font-mono font-bold mr-0.5 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-[11px]`}>
                               {linkedItem.surname}
                             </span>
                           </div>
@@ -1431,7 +1431,7 @@ export const DataTable = () => {
         </Card>
 
         <Card 
-          className="w-72 shrink-0 overflow-hidden transition-colors resize-x min-w-[250px] max-w-[600px]"
+          className="w-52 shrink-0 overflow-hidden transition-colors resize-x min-w-[180px] max-w-[400px]"
           style={{ 
             boxShadow: isOverOtherJobs ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}
@@ -1439,11 +1439,11 @@ export const DataTable = () => {
           onDragLeave={handleOtherJobsDragLeave}
           onDrop={handleDropToOtherJobs}
         >
-          <div className="bg-blue-100 p-4 space-y-3">
+          <div className="bg-blue-100 p-2 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Icon name="Briefcase" size={18} className="text-blue-700" />
-                <h2 className="text-base font-bold text-blue-700 tracking-tight">
+                <Icon name="Briefcase" size={14} className="text-blue-700" />
+                <h2 className="text-xs font-bold text-blue-700 tracking-tight">
                   Другие работы
                 </h2>
               </div>
@@ -1451,9 +1451,9 @@ export const DataTable = () => {
                 size="sm"
                 onClick={() => setIsAddingToOtherJobs(true)}
                 variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-200 h-7 w-7 p-0"
+                className="border-blue-300 text-blue-700 hover:bg-blue-200 h-5 w-5 p-0"
               >
-                <Icon name="UserPlus" size={14} />
+                <Icon name="UserPlus" size={10} />
               </Button>
             </div>
 
@@ -1471,15 +1471,15 @@ export const DataTable = () => {
                       setNewOtherJobsName('');
                     }
                   }}
-                  className="flex-1 h-8 text-sm bg-white border-blue-300"
+                  className="flex-1 h-6 text-xs bg-white border-blue-300"
                   autoFocus
                 />
                 <Button
                   size="sm"
                   onClick={handleAddToOtherJobs}
-                  className="bg-blue-500 hover:bg-blue-600 text-white h-8 w-8 p-0"
+                  className="bg-blue-500 hover:bg-blue-600 text-white h-6 w-6 p-0"
                 >
-                  <Icon name="Check" size={14} />
+                  <Icon name="Check" size={10} />
                 </Button>
                 <Button
                   size="sm"
@@ -1488,20 +1488,20 @@ export const DataTable = () => {
                     setIsAddingToOtherJobs(false);
                     setNewOtherJobsName('');
                   }}
-                  className="border-blue-300 h-8 w-8 p-0"
+                  className="border-blue-300 h-6 w-6 p-0"
                 >
-                  <Icon name="X" size={14} />
+                  <Icon name="X" size={10} />
                 </Button>
               </div>
             )}
           </div>
 
-          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
+          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
             {filteredOtherJobs.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Icon name="BriefcaseX" size={32} className="mx-auto mb-3 opacity-20" />
-                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
-                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              <div className="text-center py-4 text-muted-foreground">
+                <Icon name="BriefcaseX" size={20} className="mx-auto mb-2 opacity-20" />
+                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
+                <p className="text-[10px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
               filteredOtherJobs.map((item) => {
@@ -1516,11 +1516,11 @@ export const DataTable = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div 
-                        className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                        className={`flex-1 border ${colorOptions.find(c => c.value === item.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-0.5 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
                       >
-                        <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                        <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                        <Icon name="GripVertical" size={10} className="text-muted-foreground" />
+                        <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-[11px]`}>
                           {item.surname}
                         </span>
                       </div>
@@ -1532,10 +1532,10 @@ export const DataTable = () => {
                             e.stopPropagation();
                             handleLinkItems('otherJobs', item.id);
                           }}
-                          className={`h-7 w-7 p-0 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                          className={`h-5 w-5 p-0 ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
                           title="Связать с другой фамилией"
                         >
-                          <Icon name="Link" size={14} className="text-muted-foreground" />
+                          <Icon name="Link" size={10} className="text-muted-foreground" />
                         </Button>
                       )}
                       {linkedItem && (
@@ -1554,14 +1554,14 @@ export const DataTable = () => {
                                 return o;
                               }));
                             }}
-                            className="h-7 w-7 p-0 hover:bg-destructive/10"
+                            className="h-5 w-5 p-0 hover:bg-destructive/10"
                             title="Разорвать связь"
                           >
-                            <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                            <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
-                          <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
-                            <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
+                          <div className={`border ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-0.5`}>
+                            <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                            <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-[11px]`}>
                               {linkedItem.surname}
                             </span>
                           </div>
@@ -1576,7 +1576,7 @@ export const DataTable = () => {
         </Card>
 
         <Card 
-          className="w-72 shrink-0 overflow-hidden transition-colors resize-x min-w-[250px] max-w-[600px]"
+          className="w-52 shrink-0 overflow-hidden transition-colors resize-x min-w-[180px] max-w-[400px]"
           style={{ 
             boxShadow: isOverWeekend ? '0 0 0 3px hsl(var(--accent))' : undefined,
           }}
@@ -1584,11 +1584,11 @@ export const DataTable = () => {
           onDragLeave={handleWeekendDragLeave}
           onDrop={handleDropToWeekend}
         >
-          <div className="bg-orange-100 p-4 space-y-3">
+          <div className="bg-orange-100 p-2 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Icon name="CalendarOff" size={18} className="text-orange-700" />
-                <h2 className="text-base font-bold text-orange-700 tracking-tight">
+                <Icon name="CalendarOff" size={14} className="text-orange-700" />
+                <h2 className="text-xs font-bold text-orange-700 tracking-tight">
                   Выходные
                 </h2>
               </div>
@@ -1596,9 +1596,9 @@ export const DataTable = () => {
                 size="sm"
                 onClick={() => setIsAddingToWeekend(true)}
                 variant="outline"
-                className="border-orange-300 text-orange-700 hover:bg-orange-200 h-7 w-7 p-0"
+                className="border-orange-300 text-orange-700 hover:bg-orange-200 h-5 w-5 p-0"
               >
-                <Icon name="UserPlus" size={14} />
+                <Icon name="UserPlus" size={10} />
               </Button>
             </div>
 
@@ -1616,15 +1616,15 @@ export const DataTable = () => {
                       setNewWeekendName('');
                     }
                   }}
-                  className="flex-1 h-8 text-sm bg-white border-orange-300"
+                  className="flex-1 h-6 text-xs bg-white border-orange-300"
                   autoFocus
                 />
                 <Button
                   size="sm"
                   onClick={handleAddToWeekend}
-                  className="bg-orange-500 hover:bg-orange-600 text-white h-8 w-8 p-0"
+                  className="bg-orange-500 hover:bg-orange-600 text-white h-6 w-6 p-0"
                 >
-                  <Icon name="Check" size={14} />
+                  <Icon name="Check" size={10} />
                 </Button>
                 <Button
                   size="sm"
@@ -1633,20 +1633,20 @@ export const DataTable = () => {
                     setIsAddingToWeekend(false);
                     setNewWeekendName('');
                   }}
-                  className="border-orange-300 h-8 w-8 p-0"
+                  className="border-orange-300 h-6 w-6 p-0"
                 >
-                  <Icon name="X" size={14} />
+                  <Icon name="X" size={10} />
                 </Button>
               </div>
             )}
           </div>
 
-          <div className="p-3 space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
+          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
             {filteredWeekend.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Icon name="CalendarX" size={32} className="mx-auto mb-3 opacity-20" />
-                <p className="text-xs">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
-                <p className="text-xs mt-1">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              <div className="text-center py-4 text-muted-foreground">
+                <Icon name="CalendarX" size={20} className="mx-auto mb-2 opacity-20" />
+                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
+                <p className="text-[10px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
               filteredWeekend.map((item) => {
@@ -1669,18 +1669,18 @@ export const DataTable = () => {
                             if (e.key === 'Enter') handleSave();
                             if (e.key === 'Escape') handleCancel();
                           }}
-                          className="flex-1 h-9 text-sm"
+                          className="flex-1 h-6 text-xs"
                           autoFocus
                         />
                       ) : (
                         <>
                           <div 
                             onClick={() => handleEdit(item.id, 'surname', item.surname)}
-                            className={`flex-1 border-2 ${colorOptions.find(c => c.value === item.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-1 ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
+                            className={`flex-1 border ${colorOptions.find(c => c.value === item.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === item.color)?.bg} ${colorOptions.find(c => c.value === item.color)?.hover} transition-colors shadow-sm cursor-move flex items-center gap-0.5 ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'ring-2 ring-accent' : ''}`}
                           >
-                            <Icon name="GripVertical" size={14} className="text-muted-foreground" />
-                            <span className={`text-xs font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
-                            <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-sm`}>
+                            <Icon name="GripVertical" size={10} className="text-muted-foreground" />
+                            <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                            <span className={`${colorOptions.find(c => c.value === item.color)?.text} font-semibold text-[11px]`}>
                               {item.surname}
                             </span>
                           </div>
@@ -1692,10 +1692,10 @@ export const DataTable = () => {
                                 e.stopPropagation();
                                 handleLinkItems('weekend', item.id);
                               }}
-                              className={`h-7 w-7 p-0 ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
+                              className={`h-5 w-5 p-0 ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
                               title="Связать с другой фамилией"
                             >
-                              <Icon name="Link" size={14} className="text-muted-foreground" />
+                              <Icon name="Link" size={10} className="text-muted-foreground" />
                             </Button>
                           )}
                           {linkedItem && (
@@ -1714,14 +1714,14 @@ export const DataTable = () => {
                                     return w;
                                   }));
                                 }}
-                                className="h-7 w-7 p-0 hover:bg-destructive/10"
+                                className="h-5 w-5 p-0 hover:bg-destructive/10"
                                 title="Разорвать связь"
                               >
-                                <Icon name="Unlink" size={14} className="text-muted-foreground hover:text-destructive" />
+                                <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                               </Button>
-                              <div className={`border-2 ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded-lg px-3 py-2 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-1`}>
-                                <span className={`text-xs font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
-                                <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-sm`}>
+                              <div className={`border ${colorOptions.find(c => c.value === linkedItem.color)?.border} rounded px-2 py-1 ${colorOptions.find(c => c.value === linkedItem.color)?.bg} transition-colors shadow-sm flex items-center gap-0.5`}>
+                                <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                                <span className={`${colorOptions.find(c => c.value === linkedItem.color)?.text} font-semibold text-[11px]`}>
                                   {linkedItem.surname}
                                 </span>
                               </div>
