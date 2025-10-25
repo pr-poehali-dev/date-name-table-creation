@@ -314,6 +314,8 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             }
                             return r;
                           }));
+                        } else {
+                          onDropToTable(row.id, null, false, draggedId, false);
                         }
                       }
                       onDragEnd();
