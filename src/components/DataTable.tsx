@@ -626,17 +626,6 @@ export const DataTable = () => {
       setDraggedFromWeekend(true);
     }
     e.dataTransfer.effectAllowed = 'move';
-              <span style="font-weight: 600; font-size: 14px;">${linkedItem.surname}</span>
-            </div>
-          `;
-          
-          document.body.appendChild(dragPreview);
-          e.dataTransfer.setDragImage(dragPreview, 0, 0);
-          setTimeout(() => document.body.removeChild(dragPreview), 0);
-        }
-      }
-    }
-    e.dataTransfer.effectAllowed = 'move';
   };
 
   const handleWeekendDragOver = (e: React.DragEvent) => {
