@@ -1091,21 +1091,6 @@ export const DataTable = () => {
 
   return (
     <div className="w-full min-h-screen bg-background p-2">
-      <div className="max-w-[1800px] mx-auto mb-2">
-        <div className="bg-primary p-2 rounded">
-          <div className="relative max-w-md">
-            <Icon name="Search" size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-primary-foreground/60" />
-            <Input
-              type="text"
-              placeholder="Поиск по фамилии..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 h-6 text-xs bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
-            />
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-[1800px] mx-auto flex gap-2">
         <SingleTable 
           title="ТАБЛИЦА 1"
@@ -1631,6 +1616,41 @@ export const DataTable = () => {
                   </div>
                 );
               })
+            )}
+          </div>
+        </Card>
+      </div>
+
+      <div className="fixed bottom-4 right-4 z-50">
+        <Card className="w-64 shadow-lg">
+          <div className="bg-secondary/80 backdrop-blur-sm p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Icon name="Search" size={14} className="text-secondary-foreground" />
+              <h3 className="text-xs font-bold text-secondary-foreground">Поиск</h3>
+            </div>
+            <div className="relative">
+              <Icon name="Search" size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Введите фамилию..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 h-8 text-xs"
+              />
+            </div>
+            {searchQuery && (
+              <div className="mt-2 flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>Найдено в таблицах и блоках</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setSearchQuery('')}
+                  className="h-5 w-5 p-0"
+                  title="Очистить"
+                >
+                  <Icon name="X" size={10} />
+                </Button>
+              </div>
             )}
           </div>
         </Card>
