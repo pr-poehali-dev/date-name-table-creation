@@ -266,9 +266,6 @@ const SingleTable: React.FC<SingleTableProps> = ({
               <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider">
                 Фамилия
               </th>
-              <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider">
-                Цвет
-              </th>
               <th className="px-2 py-1.5 text-center text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider w-16">
                 Действия
               </th>
@@ -282,7 +279,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                 <React.Fragment key={`fragment-${row.id}`}>
                   {isNewDay && (
                     <tr key={`date-${row.date}-${index}`} className="sticky top-8 z-10">
-                      <td colSpan={4} className="bg-secondary px-2 py-1">
+                      <td colSpan={3} className="bg-secondary px-2 py-1">
                         <div className="flex items-center gap-1.5">
                           <Icon name="Calendar" size={12} className="text-secondary-foreground" />
                           <span className="font-semibold text-[10px] text-secondary-foreground">
@@ -440,33 +437,6 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               </div>
                             </div>
                           )}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-2 py-1.5">
-                      {editingCell?.id === row.id && editingCell.field === 'color' ? (
-                        <Select value={editValue} onValueChange={setEditValue}>
-                          <SelectTrigger className="max-w-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {colorOptions.map(color => (
-                              <SelectItem key={color.value} value={color.value}>
-                                <div className="flex items-center gap-2">
-                                  <div className={`w-4 h-4 rounded ${color.bg} border-2 ${color.border}`}></div>
-                                  {color.label}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <div 
-                          onClick={() => handleEdit(row.id, 'color', row.color)}
-                          className="cursor-pointer flex items-center gap-1"
-                        >
-                          <div className={`w-4 h-4 rounded border ${colorOptions.find(c => c.value === row.color)?.border} ${colorOptions.find(c => c.value === row.color)?.bg}`}></div>
-                          <span className="text-[10px] text-muted-foreground">{colorOptions.find(c => c.value === row.color)?.label}</span>
                         </div>
                       )}
                     </td>
