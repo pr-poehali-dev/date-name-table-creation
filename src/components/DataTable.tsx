@@ -1102,20 +1102,47 @@ export const DataTable = () => {
 
   const filteredReserve = reserve.filter(item => {
     const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
-    const isLinkedSecond = item.linkedId && reserve.find(r => r.id === item.linkedId && r.id < item.id);
-    return hasMatch && !isLinkedSecond;
+    if (!hasMatch) return false;
+    
+    if (!item.linkedId) return true;
+    
+    const linkedItem = reserve.find(r => r.id === item.linkedId);
+    if (!linkedItem) return true;
+    
+    // Show red first, otherwise show by ID
+    if (item.color === 'red' && linkedItem.color !== 'red') return true;
+    if (linkedItem.color === 'red' && item.color !== 'red') return false;
+    return item.id < linkedItem.id;
   });
 
   const filteredWeekend = weekend.filter(item => {
     const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
-    const isLinkedSecond = item.linkedId && weekend.find(w => w.id === item.linkedId && w.id < item.id);
-    return hasMatch && !isLinkedSecond;
+    if (!hasMatch) return false;
+    
+    if (!item.linkedId) return true;
+    
+    const linkedItem = weekend.find(w => w.id === item.linkedId);
+    if (!linkedItem) return true;
+    
+    // Show red first, otherwise show by ID
+    if (item.color === 'red' && linkedItem.color !== 'red') return true;
+    if (linkedItem.color === 'red' && item.color !== 'red') return false;
+    return item.id < linkedItem.id;
   });
 
   const filteredOtherJobs = otherJobs.filter(item => {
     const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
-    const isLinkedSecond = item.linkedId && otherJobs.find(o => o.id === item.linkedId && o.id < item.id);
-    return hasMatch && !isLinkedSecond;
+    if (!hasMatch) return false;
+    
+    if (!item.linkedId) return true;
+    
+    const linkedItem = otherJobs.find(o => o.id === item.linkedId);
+    if (!linkedItem) return true;
+    
+    // Show red first, otherwise show by ID
+    if (item.color === 'red' && linkedItem.color !== 'red') return true;
+    if (linkedItem.color === 'red' && item.color !== 'red') return false;
+    return item.id < linkedItem.id;
   });
 
   const handleDragFromTable = (item: {surname: string; color: string}, id: string) => {
