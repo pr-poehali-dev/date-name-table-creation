@@ -550,6 +550,82 @@ export const DataTable = () => {
       return;
     }
 
+    if (draggedFromWeekend && draggedItem) {
+      const draggedWeekendItem = weekend.find(w => w.id === draggedId);
+      const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
+      
+      if (draggedWeekendItem?.linkedId) {
+        const linkedItem = weekend.find(w => w.id === draggedWeekendItem.linkedId);
+        if (linkedItem) {
+          const newReserveId1 = `r${maxId + 1}`;
+          const newReserveId2 = `r${maxId + 2}`;
+          const counter1 = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+          const counter2 = Math.min((surnameCounters[linkedItem.surname] || 0) + 1, 9);
+          setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter1, [linkedItem.surname]: counter2});
+          
+          setReserve([
+            ...reserve,
+            { id: newReserveId1, surname: draggedItem.surname, color: draggedItem.color, counter: counter1, linkedId: newReserveId2 },
+            { id: newReserveId2, surname: linkedItem.surname, color: linkedItem.color, counter: counter2, linkedId: newReserveId1 }
+          ]);
+          setWeekend(weekend.filter(w => w.id !== draggedId && w.id !== draggedWeekendItem.linkedId));
+        } else {
+          const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+          setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
+          setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
+          setWeekend(weekend.filter(w => w.id !== draggedId));
+        }
+      } else {
+        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+        setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
+        setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
+        setWeekend(weekend.filter(w => w.id !== draggedId));
+      }
+      
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverReserve(false);
+      return;
+    }
+
+    if (draggedFromOtherJobs && draggedItem) {
+      const draggedOtherJobItem = otherJobs.find(o => o.id === draggedId);
+      const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
+      
+      if (draggedOtherJobItem?.linkedId) {
+        const linkedItem = otherJobs.find(o => o.id === draggedOtherJobItem.linkedId);
+        if (linkedItem) {
+          const newReserveId1 = `r${maxId + 1}`;
+          const newReserveId2 = `r${maxId + 2}`;
+          const counter1 = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+          const counter2 = Math.min((surnameCounters[linkedItem.surname] || 0) + 1, 9);
+          setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter1, [linkedItem.surname]: counter2});
+          
+          setReserve([
+            ...reserve,
+            { id: newReserveId1, surname: draggedItem.surname, color: draggedItem.color, counter: counter1, linkedId: newReserveId2 },
+            { id: newReserveId2, surname: linkedItem.surname, color: linkedItem.color, counter: counter2, linkedId: newReserveId1 }
+          ]);
+          setOtherJobs(otherJobs.filter(o => o.id !== draggedId && o.id !== draggedOtherJobItem.linkedId));
+        } else {
+          const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+          setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
+          setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
+          setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
+        }
+      } else {
+        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+        setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
+        setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
+        setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
+      }
+      
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverReserve(false);
+      return;
+    }
+
     const draggedRow = [...data1, ...data2].find(row => row.id === draggedId);
     if (draggedRow) {
       const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
@@ -627,10 +703,57 @@ export const DataTable = () => {
       return;
     }
 
-    if (draggedFromOtherJobs && draggedItem) {
+    if (draggedFromReserve && draggedItem) {
+      const draggedReserveItem = reserve.find(r => r.id === draggedId);
       const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
-      setWeekend([...weekend.filter(w => w.surname !== draggedItem.surname), { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
-      setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
+      
+      if (draggedReserveItem?.linkedId) {
+        const linkedItem = reserve.find(r => r.id === draggedReserveItem.linkedId);
+        if (linkedItem) {
+          const newWeekendId2 = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 2}`;
+          setWeekend([
+            ...weekend.filter(w => w.surname !== draggedItem.surname && w.surname !== linkedItem.surname),
+            { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0, linkedId: newWeekendId2 },
+            { id: newWeekendId2, surname: linkedItem.surname, color: linkedItem.color, counter: 0, linkedId: newWeekendId }
+          ]);
+          setReserve(reserve.filter(r => r.id !== draggedId && r.id !== draggedReserveItem.linkedId));
+        } else {
+          setWeekend([...weekend.filter(w => w.surname !== draggedItem.surname), { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
+          setReserve(reserve.filter(r => r.id !== draggedId));
+        }
+      } else {
+        setWeekend([...weekend.filter(w => w.surname !== draggedItem.surname), { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
+        setReserve(reserve.filter(r => r.id !== draggedId));
+      }
+      
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverWeekend(false);
+      return;
+    }
+
+    if (draggedFromOtherJobs && draggedItem) {
+      const draggedOtherJobItem = otherJobs.find(o => o.id === draggedId);
+      const newWeekendId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
+      
+      if (draggedOtherJobItem?.linkedId) {
+        const linkedItem = otherJobs.find(o => o.id === draggedOtherJobItem.linkedId);
+        if (linkedItem) {
+          const newWeekendId2 = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 2}`;
+          setWeekend([
+            ...weekend.filter(w => w.surname !== draggedItem.surname && w.surname !== linkedItem.surname),
+            { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0, linkedId: newWeekendId2 },
+            { id: newWeekendId2, surname: linkedItem.surname, color: linkedItem.color, counter: 0, linkedId: newWeekendId }
+          ]);
+          setOtherJobs(otherJobs.filter(o => o.id !== draggedId && o.id !== draggedOtherJobItem.linkedId));
+        } else {
+          setWeekend([...weekend.filter(w => w.surname !== draggedItem.surname), { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
+          setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
+        }
+      } else {
+        setWeekend([...weekend.filter(w => w.surname !== draggedItem.surname), { id: newWeekendId, surname: draggedItem.surname, color: draggedItem.color, counter: 0 }]);
+        setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
+      }
       
       setDraggedId(null);
       setDraggedItem(null);
@@ -698,11 +821,61 @@ export const DataTable = () => {
       return;
     }
 
-    if (draggedFromWeekend && draggedItem) {
+    if (draggedFromReserve && draggedItem) {
+      const draggedReserveItem = reserve.find(r => r.id === draggedId);
       const currentCounter = surnameCounters[draggedItem.surname] || 0;
       const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
-      setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter }]);
-      setWeekend(weekend.filter(w => w.id !== draggedId));
+      
+      if (draggedReserveItem?.linkedId) {
+        const linkedItem = reserve.find(r => r.id === draggedReserveItem.linkedId);
+        if (linkedItem) {
+          const newOtherJobsId2 = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 2}`;
+          const linkedCounter = surnameCounters[linkedItem.surname] || 0;
+          setOtherJobs([
+            ...otherJobs.filter(o => o.surname !== draggedItem.surname && o.surname !== linkedItem.surname),
+            { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter, linkedId: newOtherJobsId2 },
+            { id: newOtherJobsId2, surname: linkedItem.surname, color: linkedItem.color, counter: linkedCounter, linkedId: newOtherJobsId }
+          ]);
+          setReserve(reserve.filter(r => r.id !== draggedId && r.id !== draggedReserveItem.linkedId));
+        } else {
+          setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter }]);
+          setReserve(reserve.filter(r => r.id !== draggedId));
+        }
+      } else {
+        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter }]);
+        setReserve(reserve.filter(r => r.id !== draggedId));
+      }
+      
+      setDraggedId(null);
+      setDraggedItem(null);
+      setIsOverOtherJobs(false);
+      return;
+    }
+
+    if (draggedFromWeekend && draggedItem) {
+      const draggedWeekendItem = weekend.find(w => w.id === draggedId);
+      const currentCounter = surnameCounters[draggedItem.surname] || 0;
+      const newOtherJobsId = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 1}`;
+      
+      if (draggedWeekendItem?.linkedId) {
+        const linkedItem = weekend.find(w => w.id === draggedWeekendItem.linkedId);
+        if (linkedItem) {
+          const newOtherJobsId2 = `o${Math.max(...otherJobs.map(o => parseInt(o.id.slice(1))), 0) + 2}`;
+          const linkedCounter = surnameCounters[linkedItem.surname] || 0;
+          setOtherJobs([
+            ...otherJobs.filter(o => o.surname !== draggedItem.surname && o.surname !== linkedItem.surname),
+            { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter, linkedId: newOtherJobsId2 },
+            { id: newOtherJobsId2, surname: linkedItem.surname, color: linkedItem.color, counter: linkedCounter, linkedId: newOtherJobsId }
+          ]);
+          setWeekend(weekend.filter(w => w.id !== draggedId && w.id !== draggedWeekendItem.linkedId));
+        } else {
+          setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter }]);
+          setWeekend(weekend.filter(w => w.id !== draggedId));
+        }
+      } else {
+        setOtherJobs([...otherJobs.filter(o => o.surname !== draggedItem.surname), { id: newOtherJobsId, surname: draggedItem.surname, color: draggedItem.color, counter: currentCounter }]);
+        setWeekend(weekend.filter(w => w.id !== draggedId));
+      }
       
       setDraggedId(null);
       setDraggedItem(null);
