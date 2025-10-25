@@ -1023,11 +1023,24 @@ export const DataTable = () => {
         return;
       }
 
-      setReserve(reserve.map(r => {
-        if (r.id === linkingMode.id) return { ...r, linkedId: id };
-        if (r.id === id) return { ...r, linkedId: linkingMode.id };
-        return r;
-      }));
+      // Ensure red item is always first
+      const isFirstRed = firstItem?.color === 'red';
+      const isSecondRed = secondItem?.color === 'red';
+      
+      if (isSecondRed && !isFirstRed) {
+        // Swap: make red item first
+        setReserve(reserve.map(r => {
+          if (r.id === id) return { ...r, linkedId: linkingMode.id };
+          if (r.id === linkingMode.id) return { ...r, linkedId: id };
+          return r;
+        }));
+      } else {
+        setReserve(reserve.map(r => {
+          if (r.id === linkingMode.id) return { ...r, linkedId: id };
+          if (r.id === id) return { ...r, linkedId: linkingMode.id };
+          return r;
+        }));
+      }
     } else if (source === 'weekend') {
       const firstItem = weekend.find(w => w.id === linkingMode.id);
       const secondItem = weekend.find(w => w.id === id);
@@ -1037,11 +1050,24 @@ export const DataTable = () => {
         return;
       }
 
-      setWeekend(weekend.map(w => {
-        if (w.id === linkingMode.id) return { ...w, linkedId: id };
-        if (w.id === id) return { ...w, linkedId: linkingMode.id };
-        return w;
-      }));
+      // Ensure red item is always first
+      const isFirstRed = firstItem?.color === 'red';
+      const isSecondRed = secondItem?.color === 'red';
+      
+      if (isSecondRed && !isFirstRed) {
+        // Swap: make red item first
+        setWeekend(weekend.map(w => {
+          if (w.id === id) return { ...w, linkedId: linkingMode.id };
+          if (w.id === linkingMode.id) return { ...w, linkedId: id };
+          return w;
+        }));
+      } else {
+        setWeekend(weekend.map(w => {
+          if (w.id === linkingMode.id) return { ...w, linkedId: id };
+          if (w.id === id) return { ...w, linkedId: linkingMode.id };
+          return w;
+        }));
+      }
     } else if (source === 'otherJobs') {
       const firstItem = otherJobs.find(o => o.id === linkingMode.id);
       const secondItem = otherJobs.find(o => o.id === id);
@@ -1051,11 +1077,24 @@ export const DataTable = () => {
         return;
       }
 
-      setOtherJobs(otherJobs.map(o => {
-        if (o.id === linkingMode.id) return { ...o, linkedId: id };
-        if (o.id === id) return { ...o, linkedId: linkingMode.id };
-        return o;
-      }));
+      // Ensure red item is always first
+      const isFirstRed = firstItem?.color === 'red';
+      const isSecondRed = secondItem?.color === 'red';
+      
+      if (isSecondRed && !isFirstRed) {
+        // Swap: make red item first
+        setOtherJobs(otherJobs.map(o => {
+          if (o.id === id) return { ...o, linkedId: linkingMode.id };
+          if (o.id === linkingMode.id) return { ...o, linkedId: id };
+          return o;
+        }));
+      } else {
+        setOtherJobs(otherJobs.map(o => {
+          if (o.id === linkingMode.id) return { ...o, linkedId: id };
+          if (o.id === id) return { ...o, linkedId: linkingMode.id };
+          return o;
+        }));
+      }
     }
 
     setLinkingMode(null);
