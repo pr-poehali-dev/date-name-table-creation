@@ -506,6 +506,7 @@ export const DataTable = () => {
   const [newReserveName, setNewReserveName] = useState('');
   const [isAddingToReserve, setIsAddingToReserve] = useState(false);
   const [newWeekendName, setNewWeekendName] = useState('');
+  const [newWeekendColor, setNewWeekendColor] = useState('blue');
   const [isAddingToWeekend, setIsAddingToWeekend] = useState(false);
   const [newOtherJobsName, setNewOtherJobsName] = useState('');
   const [isAddingToOtherJobs, setIsAddingToOtherJobs] = useState(false);
@@ -940,8 +941,9 @@ export const DataTable = () => {
     if (!newWeekendName.trim()) return;
     
     const newId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
-    setWeekend([...weekend, { id: newId, surname: newWeekendName.trim(), color: 'blue', counter: 0 }]);
+    setWeekend([...weekend, { id: newId, surname: newWeekendName.trim(), color: newWeekendColor, counter: 0 }]);
     setNewWeekendName('');
+    setNewWeekendColor('blue');
     setIsAddingToWeekend(false);
   };
 
@@ -1659,7 +1661,7 @@ export const DataTable = () => {
             </div>
 
             {isAddingToWeekend && (
-              <div className="flex gap-2">
+              <div className="space-y-2">
                 <Input
                   type="text"
                   placeholder="Введите фамилию..."
@@ -1670,29 +1672,48 @@ export const DataTable = () => {
                     if (e.key === 'Escape') {
                       setIsAddingToWeekend(false);
                       setNewWeekendName('');
+                      setNewWeekendColor('blue');
                     }
                   }}
-                  className="flex-1 h-6 text-xs bg-white border-orange-300"
+                  className="w-full h-6 text-xs bg-white border-orange-300"
                   autoFocus
                 />
-                <Button
-                  size="sm"
-                  onClick={handleAddToWeekend}
-                  className="bg-orange-500 hover:bg-orange-600 text-white h-6 w-6 p-0"
-                >
-                  <Icon name="Check" size={10} />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setIsAddingToWeekend(false);
-                    setNewWeekendName('');
-                  }}
-                  className="border-orange-300 h-6 w-6 p-0"
-                >
-                  <Icon name="X" size={10} />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Select value={newWeekendColor} onValueChange={setNewWeekendColor}>
+                    <SelectTrigger className="h-6 text-xs flex-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {colorOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value} className="text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded ${option.bg} border ${option.border}`} />
+                            {option.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    size="sm"
+                    onClick={handleAddToWeekend}
+                    className="bg-orange-500 hover:bg-orange-600 text-white h-6 w-6 p-0"
+                  >
+                    <Icon name="Check" size={10} />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setIsAddingToWeekend(false);
+                      setNewWeekendName('');
+                      setNewWeekendColor('blue');
+                    }}
+                    className="border-orange-300 h-6 w-6 p-0"
+                  >
+                    <Icon name="X" size={10} />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
