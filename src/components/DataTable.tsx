@@ -72,7 +72,6 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const [editingCell, setEditingCell] = useState<{ id: string; field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [dragOverSecondCell, setDragOverSecondCell] = useState<string | null>(null);
-  const [linkedRows, setLinkedRows] = useState<Set<string>>(new Set());
 
   const handleEdit = (id: string, field: 'date' | 'time' | 'surname' | 'color' | 'surname2' | 'color2', currentValue: string) => {
     setEditingCell({ id, field });
@@ -98,16 +97,6 @@ const SingleTable: React.FC<SingleTableProps> = ({
   const handleCancel = () => {
     setEditingCell(null);
     setEditValue('');
-  };
-
-  const handleToggleLink = (rowId: string) => {
-    const newLinkedRows = new Set(linkedRows);
-    if (newLinkedRows.has(rowId)) {
-      newLinkedRows.delete(rowId);
-    } else {
-      newLinkedRows.add(rowId);
-    }
-    setLinkedRows(newLinkedRows);
   };
 
   const handleDelete = (id: string) => {
@@ -356,22 +345,11 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             className="cursor-move transition-colors font-medium flex items-center gap-1"
                           >
                             <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                            <div className={`border border-${row.color}-500 rounded px-2 py-0.5 bg-${row.color}-50 hover:bg-${row.color}-100 transition-colors shadow-sm flex items-center gap-0.5 ${linkedRows.has(row.id) && row.surname2 ? 'ring-1 ring-accent' : ''}`}>
+                            <div className={`border border-${row.color}-500 rounded px-2 py-0.5 bg-${row.color}-50 hover:bg-${row.color}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
                               <span className={`text-[9px] font-mono font-bold ${(row.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 0}</span>
                               <span className={`text-${row.color}-700 font-semibold text-[11px]`}>{row.surname || '—'}</span>
                             </div>
                           </div>
-                          {row.surname && row.surname2 && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleToggleLink(row.id)}
-                              className={`h-5 w-5 p-0 ${linkedRows.has(row.id) ? 'bg-accent/20' : 'hover:bg-accent/10'}`}
-                              title={linkedRows.has(row.id) ? "Разорвать связь" : "Связать фамилии"}
-                            >
-                              <Icon name={linkedRows.has(row.id) ? "Unlink" : "Link"} size={10} className="text-muted-foreground" />
-                            </Button>
-                          )}
                           {row.surname2 ? (
                             <div 
                               draggable={!editingCell}
@@ -380,7 +358,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               className="cursor-move transition-colors font-medium flex items-center gap-1"
                             >
                               <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                              <div className={`border border-${row.color2}-500 rounded px-2 py-0.5 bg-${row.color2}-50 hover:bg-${row.color2}-100 transition-colors shadow-sm flex items-center gap-0.5 ${linkedRows.has(row.id) ? 'ring-1 ring-accent' : ''}`}>
+                              <div className={`border border-${row.color2}-500 rounded px-2 py-0.5 bg-${row.color2}-50 hover:bg-${row.color2}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
                                 <span className={`text-[9px] font-mono font-bold ${(row.counter2 || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 0}</span>
                                 <span className={`text-${row.color2}-700 font-semibold text-[11px]`}>{row.surname2}</span>
                               </div>
