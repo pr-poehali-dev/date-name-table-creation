@@ -1566,60 +1566,12 @@ export const DataTable = () => {
           onDrop={handleDropToOtherJobs}
         >
           <div className="bg-blue-100 p-2 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon name="Briefcase" size={14} className="text-blue-700" />
-                <h2 className="text-xs font-bold text-blue-700 tracking-tight">
-                  Другие работы
-                </h2>
-              </div>
-              <Button
-                size="sm"
-                onClick={() => setIsAddingToOtherJobs(true)}
-                variant="outline"
-                className="border-blue-300 text-blue-700 hover:bg-blue-200 h-5 w-5 p-0"
-              >
-                <Icon name="UserPlus" size={10} />
-              </Button>
+            <div className="flex items-center gap-2">
+              <Icon name="Briefcase" size={14} className="text-blue-700" />
+              <h2 className="text-xs font-bold text-blue-700 tracking-tight">
+                Другие работы
+              </h2>
             </div>
-
-            {isAddingToOtherJobs && (
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Введите фамилию..."
-                  value={newOtherJobsName}
-                  onChange={(e) => setNewOtherJobsName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddToOtherJobs();
-                    if (e.key === 'Escape') {
-                      setIsAddingToOtherJobs(false);
-                      setNewOtherJobsName('');
-                    }
-                  }}
-                  className="flex-1 h-6 text-xs bg-white border-blue-300"
-                  autoFocus
-                />
-                <Button
-                  size="sm"
-                  onClick={handleAddToOtherJobs}
-                  className="bg-blue-500 hover:bg-blue-600 text-white h-6 w-6 p-0"
-                >
-                  <Icon name="Check" size={10} />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setIsAddingToOtherJobs(false);
-                    setNewOtherJobsName('');
-                  }}
-                  className="border-blue-300 h-6 w-6 p-0"
-                >
-                  <Icon name="X" size={10} />
-                </Button>
-              </div>
-            )}
           </div>
 
           <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
