@@ -484,13 +484,20 @@ export const DataTable = () => {
   });
   
   const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
-    { id: 'r1', surname: 'Алексеев', color: 'purple', counter: 0 },
-    { id: 'r2', surname: 'Новиков', color: 'pink', linkedId: 'r3', counter: 0 },
-    { id: 'r3', surname: 'Морозов', color: 'green', linkedId: 'r2', counter: 0 },
+    { id: 'r1', surname: 'Алексеев', color: 'red', counter: 0 },
+    { id: 'r2', surname: 'Новиков', color: 'blue', counter: 0 },
+    { id: 'r3', surname: 'Морозов', color: 'red', linkedId: 'r4', counter: 0 },
+    { id: 'r4', surname: 'Петров', color: 'blue', linkedId: 'r3', counter: 0 },
   ]);
 
-  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([]);
-  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([]);
+  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
+    { id: 'w1', surname: 'Сидоров', color: 'blue', counter: 0 },
+    { id: 'w2', surname: 'Васильев', color: 'red', counter: 0 },
+  ]);
+  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
+    { id: 'o1', surname: 'Федоров', color: 'red', linkedId: 'o2', counter: 0 },
+    { id: 'o2', surname: 'Козлов', color: 'blue', linkedId: 'o1', counter: 0 },
+  ]);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
