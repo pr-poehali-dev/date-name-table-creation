@@ -580,7 +580,8 @@ export const DataTable = () => {
           setWeekend(weekend.filter(w => w.id !== draggedId));
         }
       } else {
-        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
+        const newCount = (surnameCounters[draggedItem.surname] || 0) + 1;
+        const counter = newCount > 4 ? 1 : newCount;
         setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
         setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
         setWeekend(weekend.filter(w => w.id !== draggedId));
@@ -601,8 +602,10 @@ export const DataTable = () => {
         if (linkedItem) {
           const newReserveId1 = `r${maxId + 1}`;
           const newReserveId2 = `r${maxId + 2}`;
-          const counter1 = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
-          const counter2 = Math.min((surnameCounters[linkedItem.surname] || 0) + 1, 4);
+          const newCount1 = (surnameCounters[draggedItem.surname] || 0) + 1;
+          const counter1 = newCount1 > 4 ? 1 : newCount1;
+          const newCount2 = (surnameCounters[linkedItem.surname] || 0) + 1;
+          const counter2 = newCount2 > 4 ? 1 : newCount2;
           setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter1, [linkedItem.surname]: counter2});
           
           setReserve([
@@ -612,13 +615,15 @@ export const DataTable = () => {
           ]);
           setOtherJobs(otherJobs.filter(o => o.id !== draggedId && o.id !== draggedOtherJobItem.linkedId));
         } else {
-          const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
+          const newCount = (surnameCounters[draggedItem.surname] || 0) + 1;
+          const counter = newCount > 4 ? 1 : newCount;
           setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
           setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
           setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
         }
       } else {
-        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
+        const newCount = (surnameCounters[draggedItem.surname] || 0) + 1;
+        const counter = newCount > 4 ? 1 : newCount;
         setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
         setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
         setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
@@ -635,7 +640,8 @@ export const DataTable = () => {
       const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
       
       if (draggedFromSecond && draggedRow.surname2) {
-        const counter = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 4);
+        const newCount = (surnameCounters[draggedRow.surname2] || 0) + 1;
+        const counter = newCount > 4 ? 1 : newCount;
         setSurnameCounters({...surnameCounters, [draggedRow.surname2]: counter});
         
         const newReserveId = `r${maxId + 1}`;
@@ -648,8 +654,10 @@ export const DataTable = () => {
           const newReserveId1 = `r${maxId + 1}`;
           const newReserveId2 = `r${maxId + 2}`;
           
-          const counter1 = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 4);
-          const counter2 = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 4);
+          const newCount1 = (surnameCounters[draggedRow.surname] || 0) + 1;
+          const counter1 = newCount1 > 4 ? 1 : newCount1;
+          const newCount2 = (surnameCounters[draggedRow.surname2] || 0) + 1;
+          const counter2 = newCount2 > 4 ? 1 : newCount2;
           setSurnameCounters({...surnameCounters, [draggedRow.surname]: counter1, [draggedRow.surname2]: counter2});
           
           setReserve([
@@ -658,7 +666,8 @@ export const DataTable = () => {
             { id: newReserveId2, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', linkedId: newReserveId1, counter: counter2 }
           ]);
         } else {
-          const counter = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 4);
+          const newCount = (surnameCounters[draggedRow.surname] || 0) + 1;
+          const counter = newCount > 4 ? 1 : newCount;
           setSurnameCounters({...surnameCounters, [draggedRow.surname]: counter});
           
           const newReserveId = `r${maxId + 1}`;
@@ -1355,8 +1364,10 @@ export const DataTable = () => {
               const newReserveId1 = `r${maxId + 1}`;
               const newReserveId2 = `r${maxId + 2}`;
               
-              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 4);
-              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 4);
+              const newCount1 = (surnameCounters[surname] || 0) + 1;
+              const counter1 = newCount1 > 4 ? 1 : newCount1;
+              const newCount2 = (surnameCounters[surname2] || 0) + 1;
+              const counter2 = newCount2 > 4 ? 1 : newCount2;
               setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
               
               setReserve([
@@ -1365,11 +1376,13 @@ export const DataTable = () => {
                 { id: newReserveId2, surname: surname2, color: color2 || 'green', linkedId: newReserveId1, counter: counter2 }
               ]);
             } else if (surname) {
-              const counter = Math.min((surnameCounters[surname] || 0) + 1, 4);
+              const newCount = (surnameCounters[surname] || 0) + 1;
+              const counter = newCount > 4 ? 1 : newCount;
               setSurnameCounters({...surnameCounters, [surname]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname, color, counter }]);
             } else if (surname2) {
-              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 4);
+              const newCount = (surnameCounters[surname2] || 0) + 1;
+              const counter = newCount > 4 ? 1 : newCount;
               setSurnameCounters({...surnameCounters, [surname2]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname: surname2, color: color2 || 'green', counter }]);
             }
@@ -1395,8 +1408,10 @@ export const DataTable = () => {
               const newReserveId1 = `r${maxId + 1}`;
               const newReserveId2 = `r${maxId + 2}`;
               
-              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 4);
-              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 4);
+              const newCount1 = (surnameCounters[surname] || 0) + 1;
+              const counter1 = newCount1 > 4 ? 1 : newCount1;
+              const newCount2 = (surnameCounters[surname2] || 0) + 1;
+              const counter2 = newCount2 > 4 ? 1 : newCount2;
               setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
               
               setReserve([
@@ -1405,11 +1420,13 @@ export const DataTable = () => {
                 { id: newReserveId2, surname: surname2, color: color2 || 'green', linkedId: newReserveId1, counter: counter2 }
               ]);
             } else if (surname) {
-              const counter = Math.min((surnameCounters[surname] || 0) + 1, 4);
+              const newCount = (surnameCounters[surname] || 0) + 1;
+              const counter = newCount > 4 ? 1 : newCount;
               setSurnameCounters({...surnameCounters, [surname]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname, color, counter }]);
             } else if (surname2) {
-              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 4);
+              const newCount = (surnameCounters[surname2] || 0) + 1;
+              const counter = newCount > 4 ? 1 : newCount;
               setSurnameCounters({...surnameCounters, [surname2]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname: surname2, color: color2 || 'green', counter }]);
             }
