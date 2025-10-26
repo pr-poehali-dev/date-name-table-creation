@@ -342,7 +342,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           >
                             <Icon name="GripVertical" size={10} className="text-muted-foreground" />
                             <div className={`border border-${row.color}-500 rounded px-2 py-0.5 bg-${row.color}-50 hover:bg-${row.color}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
-                              <span className={`text-[9px] font-mono font-bold ${(row.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 0}</span>
+                              <span className={`text-[9px] font-mono font-bold ${(row.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 1}</span>
                               <span className={`text-${row.color}-700 font-semibold text-[11px]`}>{row.surname || '—'}</span>
                             </div>
                           </div>
@@ -355,7 +355,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             >
                               <Icon name="GripVertical" size={10} className="text-muted-foreground" />
                               <div className={`border border-${row.color2}-500 rounded px-2 py-0.5 bg-${row.color2}-50 hover:bg-${row.color2}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
-                                <span className={`text-[9px] font-mono font-bold ${(row.counter2 || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 0}</span>
+                                <span className={`text-[9px] font-mono font-bold ${(row.counter2 || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 1}</span>
                                 <span className={`text-${row.color2}-700 font-semibold text-[11px]`}>{row.surname2}</span>
                               </div>
                             </div>
@@ -484,19 +484,19 @@ export const DataTable = () => {
   });
   
   const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
-    { id: 'r1', surname: 'Алексеев', color: 'red', counter: 0 },
-    { id: 'r2', surname: 'Новиков', color: 'blue', counter: 0 },
-    { id: 'r3', surname: 'Морозов', color: 'red', linkedId: 'r4', counter: 0 },
-    { id: 'r4', surname: 'Петров', color: 'blue', linkedId: 'r3', counter: 0 },
+    { id: 'r1', surname: 'Алексеев', color: 'red', counter: 1 },
+    { id: 'r2', surname: 'Новиков', color: 'blue', counter: 1 },
+    { id: 'r3', surname: 'Морозов', color: 'red', linkedId: 'r4', counter: 1 },
+    { id: 'r4', surname: 'Петров', color: 'blue', linkedId: 'r3', counter: 1 },
   ]);
 
   const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
-    { id: 'w1', surname: 'Сидоров', color: 'blue', counter: 0 },
-    { id: 'w2', surname: 'Васильев', color: 'red', counter: 0 },
+    { id: 'w1', surname: 'Сидоров', color: 'blue', counter: 1 },
+    { id: 'w2', surname: 'Васильев', color: 'red', counter: 1 },
   ]);
   const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
-    { id: 'o1', surname: 'Федоров', color: 'red', linkedId: 'o2', counter: 0 },
-    { id: 'o2', surname: 'Козлов', color: 'blue', linkedId: 'o1', counter: 0 },
+    { id: 'o1', surname: 'Федоров', color: 'red', linkedId: 'o2', counter: 1 },
+    { id: 'o2', surname: 'Козлов', color: 'blue', linkedId: 'o1', counter: 1 },
   ]);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
@@ -563,8 +563,8 @@ export const DataTable = () => {
         if (linkedItem) {
           const newReserveId1 = `r${maxId + 1}`;
           const newReserveId2 = `r${maxId + 2}`;
-          const counter1 = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
-          const counter2 = Math.min((surnameCounters[linkedItem.surname] || 0) + 1, 9);
+          const counter1 = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
+          const counter2 = Math.min((surnameCounters[linkedItem.surname] || 0) + 1, 4);
           setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter1, [linkedItem.surname]: counter2});
           
           setReserve([
@@ -574,13 +574,13 @@ export const DataTable = () => {
           ]);
           setWeekend(weekend.filter(w => w.id !== draggedId && w.id !== draggedWeekendItem.linkedId));
         } else {
-          const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+          const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
           setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
           setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
           setWeekend(weekend.filter(w => w.id !== draggedId));
         }
       } else {
-        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
         setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
         setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
         setWeekend(weekend.filter(w => w.id !== draggedId));
@@ -601,8 +601,8 @@ export const DataTable = () => {
         if (linkedItem) {
           const newReserveId1 = `r${maxId + 1}`;
           const newReserveId2 = `r${maxId + 2}`;
-          const counter1 = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
-          const counter2 = Math.min((surnameCounters[linkedItem.surname] || 0) + 1, 9);
+          const counter1 = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
+          const counter2 = Math.min((surnameCounters[linkedItem.surname] || 0) + 1, 4);
           setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter1, [linkedItem.surname]: counter2});
           
           setReserve([
@@ -612,13 +612,13 @@ export const DataTable = () => {
           ]);
           setOtherJobs(otherJobs.filter(o => o.id !== draggedId && o.id !== draggedOtherJobItem.linkedId));
         } else {
-          const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+          const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
           setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
           setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
           setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
         }
       } else {
-        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 9);
+        const counter = Math.min((surnameCounters[draggedItem.surname] || 0) + 1, 4);
         setSurnameCounters({...surnameCounters, [draggedItem.surname]: counter});
         setReserve([...reserve, { id: `r${maxId + 1}`, surname: draggedItem.surname, color: draggedItem.color, counter }]);
         setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
@@ -635,7 +635,7 @@ export const DataTable = () => {
       const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
       
       if (draggedFromSecond && draggedRow.surname2) {
-        const counter = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 9);
+        const counter = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 4);
         setSurnameCounters({...surnameCounters, [draggedRow.surname2]: counter});
         
         const newReserveId = `r${maxId + 1}`;
@@ -648,8 +648,8 @@ export const DataTable = () => {
           const newReserveId1 = `r${maxId + 1}`;
           const newReserveId2 = `r${maxId + 2}`;
           
-          const counter1 = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 9);
-          const counter2 = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 9);
+          const counter1 = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 4);
+          const counter2 = Math.min((surnameCounters[draggedRow.surname2] || 0) + 1, 4);
           setSurnameCounters({...surnameCounters, [draggedRow.surname]: counter1, [draggedRow.surname2]: counter2});
           
           setReserve([
@@ -658,7 +658,7 @@ export const DataTable = () => {
             { id: newReserveId2, surname: draggedRow.surname2, color: draggedRow.color2 || 'green', linkedId: newReserveId1, counter: counter2 }
           ]);
         } else {
-          const counter = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 9);
+          const counter = Math.min((surnameCounters[draggedRow.surname] || 0) + 1, 4);
           setSurnameCounters({...surnameCounters, [draggedRow.surname]: counter});
           
           const newReserveId = `r${maxId + 1}`;
@@ -1355,8 +1355,8 @@ export const DataTable = () => {
               const newReserveId1 = `r${maxId + 1}`;
               const newReserveId2 = `r${maxId + 2}`;
               
-              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 9);
-              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 4);
+              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 4);
               setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
               
               setReserve([
@@ -1365,11 +1365,11 @@ export const DataTable = () => {
                 { id: newReserveId2, surname: surname2, color: color2 || 'green', linkedId: newReserveId1, counter: counter2 }
               ]);
             } else if (surname) {
-              const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
+              const counter = Math.min((surnameCounters[surname] || 0) + 1, 4);
               setSurnameCounters({...surnameCounters, [surname]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname, color, counter }]);
             } else if (surname2) {
-              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 4);
               setSurnameCounters({...surnameCounters, [surname2]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname: surname2, color: color2 || 'green', counter }]);
             }
@@ -1395,8 +1395,8 @@ export const DataTable = () => {
               const newReserveId1 = `r${maxId + 1}`;
               const newReserveId2 = `r${maxId + 2}`;
               
-              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 9);
-              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              const counter1 = Math.min((surnameCounters[surname] || 0) + 1, 4);
+              const counter2 = Math.min((surnameCounters[surname2] || 0) + 1, 4);
               setSurnameCounters({...surnameCounters, [surname]: counter1, [surname2]: counter2});
               
               setReserve([
@@ -1405,11 +1405,11 @@ export const DataTable = () => {
                 { id: newReserveId2, surname: surname2, color: color2 || 'green', linkedId: newReserveId1, counter: counter2 }
               ]);
             } else if (surname) {
-              const counter = Math.min((surnameCounters[surname] || 0) + 1, 9);
+              const counter = Math.min((surnameCounters[surname] || 0) + 1, 4);
               setSurnameCounters({...surnameCounters, [surname]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname, color, counter }]);
             } else if (surname2) {
-              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 9);
+              const counter = Math.min((surnameCounters[surname2] || 0) + 1, 4);
               setSurnameCounters({...surnameCounters, [surname2]: counter});
               setReserve([...reserve, { id: `r${maxId + 1}`, surname: surname2, color: color2 || 'green', counter }]);
             }
@@ -1458,7 +1458,7 @@ export const DataTable = () => {
                         className={`border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 flex-1 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                       >
                         <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                        <span className={`text-[9px] font-mono font-bold mr-0.5 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`text-[9px] font-mono font-bold mr-0.5 ${(item.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 1}</span>
                         <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
                           {item.surname}
                         </span>
@@ -1492,7 +1492,7 @@ export const DataTable = () => {
                             <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
                           <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
-                            <span className={`text-[9px] font-mono font-bold mr-0.5 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                            <span className={`text-[9px] font-mono font-bold mr-0.5 ${(linkedItem.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 1}</span>
                             <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
                               {linkedItem.surname}
                             </span>
@@ -1631,7 +1631,7 @@ export const DataTable = () => {
                             className={`flex-1 border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'weekend' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                           >
                             <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                            <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                            <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 1}</span>
                             <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
                               {item.surname}
                             </span>
@@ -1672,7 +1672,7 @@ export const DataTable = () => {
                                 <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                               </Button>
                               <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
-                                <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                                <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 1}</span>
                                 <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
                                   {linkedItem.surname}
                                 </span>
@@ -1731,7 +1731,7 @@ export const DataTable = () => {
                         className={`flex-1 border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                       >
                         <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                        <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 0}</span>
+                        <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 1}</span>
                         <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
                           {item.surname}
                         </span>
@@ -1772,7 +1772,7 @@ export const DataTable = () => {
                             <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
                           <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
-                            <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 0) > 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 0}</span>
+                            <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 1}</span>
                             <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
                               {linkedItem.surname}
                             </span>
