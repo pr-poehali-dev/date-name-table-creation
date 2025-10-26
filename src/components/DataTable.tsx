@@ -478,7 +478,6 @@ export const DataTable = () => {
   const [editValue, setEditValue] = useState('');
   const [surnameCounters, setSurnameCounters] = useState<Record<string, number>>({});
   const [linkingMode, setLinkingMode] = useState<{ source: 'reserve' | 'weekend' | 'otherJobs'; id: string } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);
@@ -1073,58 +1072,7 @@ export const DataTable = () => {
     setLinkingMode(null);
   };
 
-  const handleLoadSurnames = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('https://functions.poehali.dev/5d0d94c8-5462-4b03-b780-4b48f4ee7c68', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (!response.ok) throw new Error('Failed to load surnames');
-      
-      const result = await response.json();
-      alert(`Успешно загружено ${result.inserted} фамилий в базу данных!`);
-    } catch (error) {
-      console.error('Error loading surnames:', error);
-      alert('Ошибка при загрузке фамилий');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const handleFetchFromDB = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('https://functions.poehali.dev/39628ecf-c9f0-4daf-aa29-9073a93ed284');
-      
-      if (!response.ok) throw new Error('Failed to fetch surnames');
-      
-      const result = await response.json();
-      const dbSurnames = result.surnames || [];
-      
-      const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
-      let newId = maxId;
-      
-      const newReserveItems = dbSurnames.map((item: any) => {
-        newId++;
-        return {
-          id: `r${newId}`,
-          surname: item.surname,
-          color: item.color,
-          counter: item.counter || 1
-        };
-      });
-      
-      setReserve([...reserve, ...newReserveItems]);
-      alert(`Загружено ${dbSurnames.length} фамилий из базы данных!`);
-    } catch (error) {
-      console.error('Error fetching surnames:', error);
-      alert('Ошибка при загрузке фамилий из БД');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const filteredReserve = reserve.filter(item => {
     const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
@@ -1461,23 +1409,11 @@ export const DataTable = () => {
           onDrop={handleDropToReserve}
         >
           <div className="bg-secondary p-2 space-y-2">
-            <div className="flex items-center justify-between gap-1.5">
-              <div className="flex items-center gap-1.5">
-                <Icon name="Users" size={14} className="text-secondary-foreground" />
-                <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
-                  В работе
-                </h2>
-              </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleFetchFromDB}
-                disabled={isLoading}
-                className="h-6 px-2 text-[10px]"
-                title="Загрузить из БД"
-              >
-                <Icon name="Download" size={12} />
-              </Button>
+            <div className="flex items-center gap-1.5">
+              <Icon name="Users" size={14} className="text-secondary-foreground" />
+              <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
+                В работе
+              </h2>
             </div>
           </div>
 
@@ -1834,7 +1770,7 @@ export const DataTable = () => {
         </Card>
       </div>
 
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <div className="fixed bottom-4 right-4 z-50">
         <Card className="w-64 shadow-lg">
           <div className="bg-secondary/80 backdrop-blur-sm p-3">
             <div className="flex items-center gap-2 mb-2">
@@ -1867,15 +1803,6 @@ export const DataTable = () => {
             )}
           </div>
         </Card>
-        
-        <Button
-          onClick={handleLoadSurnames}
-          disabled={isLoading}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
-        >
-          <Icon name="Database" size={16} className="mr-2" />
-          {isLoading ? 'Загрузка...' : 'Загрузить 500 фамилий'}
-        </Button>
       </div>
     </div>
   );
