@@ -333,7 +333,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               <span className={`text-${row.color}-700 font-semibold text-[11px]`}>{row.surname || '—'}</span>
                             </div>
                           </div>
-                          {row.surname2 ? (
+                          {row.surname2 && (
                             <div 
                               draggable={!editingCell}
                               onDragStart={(e) => handleDragStart2(e, row.id)}
@@ -346,38 +346,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                                 <span className={`text-${row.color2}-700 font-semibold text-[11px]`}>{row.surname2}</span>
                               </div>
                             </div>
-                          ) : row.surname ? (
-                            <div 
-                              onDragOver={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setDragOverSecondCell(row.id);
-                              }}
-                              onDragLeave={(e) => {
-                                e.stopPropagation();
-                                setDragOverSecondCell(null);
-                              }}
-                              onDrop={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                if (draggedId && draggedId !== row.id) {
-                                  onDropToTable(row.id, null, false, draggedId, true);
-                                }
-                                setDragOverSecondCell(null);
-                              }}
-                              className={`cursor-pointer transition-colors font-medium flex items-center gap-1 ${
-                                dragOverSecondCell === row.id ? 'scale-110' : ''
-                              }`}
-                            >
-                              <div className={`border-2 ${
-                                dragOverSecondCell === row.id 
-                                  ? 'border-accent bg-accent/20' 
-                                  : 'border-dashed border-gray-300 bg-gray-50'
-                              } rounded px-2 py-0.5 hover:bg-gray-100 transition-all shadow-sm`}>
-                                <span className="text-gray-400 font-semibold text-[11px]">+</span>
-                              </div>
-                            </div>
-                          ) : null}
+                          )}
                         </div>
                       )}
                     </td>
