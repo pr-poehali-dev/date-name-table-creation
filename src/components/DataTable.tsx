@@ -1526,7 +1526,7 @@ export const DataTable = () => {
               <div className="flex items-center gap-2">
                 <Icon name="CalendarOff" size={14} className="text-orange-700" />
                 <h2 className="text-xs font-bold text-orange-700 tracking-tight">
-                  Выходные
+                  Отсутствуют
                 </h2>
               </div>
               <Button
