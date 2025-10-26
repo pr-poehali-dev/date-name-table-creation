@@ -205,9 +205,9 @@ const SingleTable: React.FC<SingleTableProps> = ({
 
   return (
     <Card className="flex-1 overflow-hidden resize-x min-w-[300px] max-w-full">
-      <div className="bg-primary p-2">
+      <div className="bg-card border-b border-border p-2">
         <div className="flex items-center justify-between">
-          <h1 className="text-sm font-bold text-primary-foreground tracking-tight">
+          <h1 className="text-sm font-bold text-foreground tracking-tight">
             {title}
           </h1>
           <Button 
