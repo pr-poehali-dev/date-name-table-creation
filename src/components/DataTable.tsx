@@ -231,10 +231,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
                 <React.Fragment key={`fragment-${row.id}`}>
                   {isNewDay && (
                     <tr key={`date-${row.date}-${index}`} className="sticky top-0 z-10">
-                      <td colSpan={3} className="bg-secondary px-2 py-1">
-                        <div className="flex items-center gap-1.5">
-                          <Icon name="Calendar" size={12} className="text-secondary-foreground" />
-                          <span className="font-semibold text-[10px] text-secondary-foreground">
+                      <td colSpan={3} className="bg-secondary px-2 py-0.5">
+                        <div className="flex items-center gap-1">
+                          <Icon name="Calendar" size={10} className="text-secondary-foreground" />
+                          <span className="font-semibold text-[9px] text-secondary-foreground">
                             {new Date(row.date).toLocaleDateString('ru-RU', { 
                               weekday: 'short', 
                               month: 'short', 
@@ -274,7 +274,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                       onDragEnd();
                     }}
                   >
-                    <td className="px-2 py-0.5">
+                    <td className="px-1.5 py-0">
                       {editingCell?.id === row.id && editingCell.field === 'time' ? (
                         <Select value={editValue} onValueChange={setEditValue}>
                           <SelectTrigger className="max-w-xs h-6 text-xs">
@@ -289,12 +289,12 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="text-foreground font-mono text-[11px]">
+                        <div className="text-foreground font-mono text-[10px]">
                           {row.time}
                         </div>
                       )}
                     </td>
-                    <td className="px-2 py-0.5">
+                    <td className="px-1.5 py-0">
                       {editingCell?.id === row.id && editingCell.field === 'surname' ? (
                         <Input
                           type="text"
@@ -381,7 +381,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                         </div>
                       )}
                     </td>
-                    <td className="px-2 py-0.5">
+                    <td className="px-1.5 py-0">
                       <div className="flex items-center justify-center gap-1">
                         {editingCell?.id === row.id ? (
                           <>
