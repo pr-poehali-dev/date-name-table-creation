@@ -940,7 +940,7 @@ export const DataTable = () => {
     if (!newWeekendName.trim()) return;
     
     const newId = `w${Math.max(...weekend.map(w => parseInt(w.id.slice(1))), 0) + 1}`;
-    setWeekend([...weekend, { id: newId, surname: newWeekendName.trim(), color: newWeekendColor, counter: 0 }]);
+    setWeekend([{ id: newId, surname: newWeekendName.trim(), color: newWeekendColor, counter: 0 }, ...weekend]);
     setNewWeekendName('');
     setNewWeekendColor('blue');
     setIsAddingToWeekend(false);
