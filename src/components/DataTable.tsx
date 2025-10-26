@@ -1430,10 +1430,10 @@ export const DataTable = () => {
           onDragLeave={handleReserveDragLeave}
           onDrop={handleDropToReserve}
         >
-          <div className="bg-secondary p-2 space-y-2">
+          <div className="bg-card border-b border-border p-2 space-y-2">
             <div className="flex items-center gap-1.5">
-              <Icon name="Users" size={14} className="text-secondary-foreground" />
-              <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
+              <Icon name="Users" size={14} className="text-foreground" />
+              <h2 className="text-xs font-bold text-foreground tracking-tight">
                 В работе
               </h2>
             </div>
@@ -1521,11 +1521,11 @@ export const DataTable = () => {
           onDragLeave={handleWeekendDragLeave}
           onDrop={handleDropToWeekend}
         >
-          <div className="bg-orange-100 p-2 space-y-2">
+          <div className="bg-card border-b border-border p-2 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Icon name="CalendarOff" size={14} className="text-orange-700" />
-                <h2 className="text-xs font-bold text-orange-700 tracking-tight">
+                <Icon name="CalendarOff" size={14} className="text-foreground" />
+                <h2 className="text-xs font-bold text-foreground tracking-tight">
                   Отсутствуют
                 </h2>
               </div>
@@ -1703,10 +1703,10 @@ export const DataTable = () => {
           onDragLeave={handleOtherJobsDragLeave}
           onDrop={handleDropToOtherJobs}
         >
-          <div className="bg-blue-100 p-2 space-y-2">
+          <div className="bg-card border-b border-border p-2 space-y-2">
             <div className="flex items-center gap-2">
-              <Icon name="Briefcase" size={14} className="text-blue-700" />
-              <h2 className="text-xs font-bold text-blue-700 tracking-tight">
+              <Icon name="Briefcase" size={14} className="text-foreground" />
+              <h2 className="text-xs font-bold text-foreground tracking-tight">
                 Другие работы
               </h2>
             </div>
