@@ -221,7 +221,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[calc(100vh-180px)] overflow-y-auto resize-y min-h-[200px]">
+      <div className="overflow-x-auto max-h-[calc(100vh-120px)] overflow-y-auto">
         <table className="w-full">
           <tbody className="bg-card divide-y divide-border">
             {(searchQuery ? filteredData : initialData).map((row, index, array) => {
@@ -1415,7 +1415,7 @@ export const DataTable = () => {
             </div>
           </div>
 
-          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
+          <div className="p-2 space-y-1.5 max-h-[calc(100vh-120px)] overflow-y-auto">
             {filteredReserve.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground">
                 <Icon name="UserX" size={20} className="mx-auto mb-2 opacity-20" />
@@ -1573,7 +1573,7 @@ export const DataTable = () => {
             )}
           </div>
 
-          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
+          <div className="p-2 space-y-1.5 max-h-[calc(100vh-120px)] overflow-y-auto">
             {filteredWeekend.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground">
                 <Icon name="CalendarX" size={20} className="mx-auto mb-2 opacity-20" />
@@ -1688,7 +1688,7 @@ export const DataTable = () => {
             </div>
           </div>
 
-          <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
+          <div className="p-2 space-y-1.5 max-h-[calc(100vh-120px)] overflow-y-auto">
             {filteredOtherJobs.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground">
                 <Icon name="BriefcaseX" size={20} className="mx-auto mb-2 opacity-20" />
