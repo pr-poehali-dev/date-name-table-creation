@@ -1333,7 +1333,7 @@ export const DataTable = () => {
     <div className="w-full min-h-screen bg-background p-2">
       <div className="max-w-[1800px] mx-auto flex gap-2">
         <SingleTable 
-          title="ТАБЛИЦА 1"
+          title="Уруша"
           initialData={data1}
           onDataChange={setData1}
           searchQuery={searchQuery}
