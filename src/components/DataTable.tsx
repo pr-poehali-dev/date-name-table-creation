@@ -346,7 +346,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                                 <span className={`text-${row.color2}-700 font-semibold text-[11px]`}>{row.surname2}</span>
                               </div>
                             </div>
-                          ) : (
+                          ) : row.surname ? (
                             <div 
                               onDragOver={(e) => {
                                 e.preventDefault();
@@ -377,7 +377,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                                 <span className="text-gray-400 font-semibold text-[11px]">+</span>
                               </div>
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       )}
                     </td>
