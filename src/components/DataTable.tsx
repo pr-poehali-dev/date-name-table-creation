@@ -230,7 +230,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
               return (
                 <React.Fragment key={`fragment-${row.id}`}>
                   {isNewDay && (
-                    <tr key={`date-${row.date}-${index}`} className="sticky top-8 z-10">
+                    <tr key={`date-${row.date}-${index}`} className="sticky top-0 z-10">
                       <td colSpan={3} className="bg-secondary px-2 py-1">
                         <div className="flex items-center gap-1.5">
                           <Icon name="Calendar" size={12} className="text-secondary-foreground" />
