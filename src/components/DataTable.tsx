@@ -1434,7 +1434,7 @@ export const DataTable = () => {
             <div className="flex items-center gap-1.5">
               <Icon name="Users" size={14} className="text-secondary-foreground" />
               <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
-                Резерв
+                В работе
               </h2>
             </div>
           </div>
@@ -1443,7 +1443,7 @@ export const DataTable = () => {
             {filteredReserve.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground">
                 <Icon name="UserX" size={20} className="mx-auto mb-2 opacity-20" />
-                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Резерв пуст'}</p>
+                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
                 <p className="text-[10px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
