@@ -289,7 +289,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="text-foreground font-mono text-[10px]">
+                        <div className="text-foreground font-mono font-bold text-[10px]">
                           {row.time}
                         </div>
                       )}
