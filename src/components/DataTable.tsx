@@ -1306,8 +1306,8 @@ export const DataTable = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-background p-2">
-      <div className="max-w-[1800px] mx-auto flex gap-2">
+    <div className="w-full h-screen bg-background p-2 overflow-hidden">
+      <div className="max-w-full h-full mx-auto flex gap-2">
         <SingleTable 
           title="Уруша"
           initialData={data1}
