@@ -1093,6 +1093,39 @@ export const DataTable = () => {
     }
   };
 
+  const handleFetchFromDB = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/39628ecf-c9f0-4daf-aa29-9073a93ed284');
+      
+      if (!response.ok) throw new Error('Failed to fetch surnames');
+      
+      const result = await response.json();
+      const dbSurnames = result.surnames || [];
+      
+      const maxId = Math.max(...reserve.map(r => parseInt(r.id.slice(1))), 0);
+      let newId = maxId;
+      
+      const newReserveItems = dbSurnames.map((item: any) => {
+        newId++;
+        return {
+          id: `r${newId}`,
+          surname: item.surname,
+          color: item.color,
+          counter: item.counter || 1
+        };
+      });
+      
+      setReserve([...reserve, ...newReserveItems]);
+      alert(`Загружено ${dbSurnames.length} фамилий из базы данных!`);
+    } catch (error) {
+      console.error('Error fetching surnames:', error);
+      alert('Ошибка при загрузке фамилий из БД');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const filteredReserve = reserve.filter(item => {
     const hasMatch = item.surname.toLowerCase().includes(searchQuery.toLowerCase());
     if (!hasMatch) return false;
@@ -1428,11 +1461,23 @@ export const DataTable = () => {
           onDrop={handleDropToReserve}
         >
           <div className="bg-secondary p-2 space-y-2">
-            <div className="flex items-center gap-1.5">
-              <Icon name="Users" size={14} className="text-secondary-foreground" />
-              <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
-                В работе
-              </h2>
+            <div className="flex items-center justify-between gap-1.5">
+              <div className="flex items-center gap-1.5">
+                <Icon name="Users" size={14} className="text-secondary-foreground" />
+                <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
+                  В работе
+                </h2>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleFetchFromDB}
+                disabled={isLoading}
+                className="h-6 px-2 text-[10px]"
+                title="Загрузить из БД"
+              >
+                <Icon name="Download" size={12} />
+              </Button>
             </div>
           </div>
 

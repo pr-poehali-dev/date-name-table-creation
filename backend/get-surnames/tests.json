@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "Get all surnames",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "surnames": "array",
+        "total": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
