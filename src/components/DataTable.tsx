@@ -1427,60 +1427,12 @@ export const DataTable = () => {
           onDrop={handleDropToReserve}
         >
           <div className="bg-secondary p-2 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Icon name="Users" size={14} className="text-secondary-foreground" />
-                <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
-                  Резерв
-                </h2>
-              </div>
-              <Button
-                size="sm"
-                onClick={() => setIsAddingToReserve(true)}
-                variant="outline"
-                className="border-secondary-foreground/20 text-secondary-foreground hover:bg-secondary-foreground/10 h-5 w-5 p-0"
-              >
-                <Icon name="UserPlus" size={10} />
-              </Button>
+            <div className="flex items-center gap-1.5">
+              <Icon name="Users" size={14} className="text-secondary-foreground" />
+              <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
+                Резерв
+              </h2>
             </div>
-
-            {isAddingToReserve && (
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Введите фамилию..."
-                  value={newReserveName}
-                  onChange={(e) => setNewReserveName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddToReserve();
-                    if (e.key === 'Escape') {
-                      setIsAddingToReserve(false);
-                      setNewReserveName('');
-                    }
-                  }}
-                  className="flex-1 h-6 text-xs bg-secondary-foreground/10 border-secondary-foreground/20"
-                  autoFocus
-                />
-                <Button
-                  size="sm"
-                  onClick={handleAddToReserve}
-                  className="bg-accent hover:bg-accent/90 h-6 w-6 p-0"
-                >
-                  <Icon name="Check" size={10} />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setIsAddingToReserve(false);
-                    setNewReserveName('');
-                  }}
-                  className="border-secondary-foreground/20 h-6 w-6 p-0"
-                >
-                  <Icon name="X" size={10} />
-                </Button>
-              </div>
-            )}
           </div>
 
           <div className="p-2 space-y-1.5 max-h-[calc(100vh-180px)] overflow-y-auto">
