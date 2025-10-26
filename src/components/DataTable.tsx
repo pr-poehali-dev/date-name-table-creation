@@ -274,7 +274,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                       onDragEnd();
                     }}
                   >
-                    <td className="px-2 py-1.5">
+                    <td className="px-2 py-0.5">
                       {editingCell?.id === row.id && editingCell.field === 'time' ? (
                         <Select value={editValue} onValueChange={setEditValue}>
                           <SelectTrigger className="max-w-xs h-6 text-xs">
@@ -294,7 +294,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                         </div>
                       )}
                     </td>
-                    <td className="px-2 py-1.5">
+                    <td className="px-2 py-0.5">
                       {editingCell?.id === row.id && editingCell.field === 'surname' ? (
                         <Input
                           type="text"
@@ -381,7 +381,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                         </div>
                       )}
                     </td>
-                    <td className="px-2 py-1.5">
+                    <td className="px-2 py-0.5">
                       <div className="flex items-center justify-center gap-1">
                         {editingCell?.id === row.id ? (
                           <>
