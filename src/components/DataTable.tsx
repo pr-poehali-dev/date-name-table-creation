@@ -223,19 +223,6 @@ const SingleTable: React.FC<SingleTableProps> = ({
 
       <div className="overflow-x-auto max-h-[calc(100vh-180px)] overflow-y-auto resize-y min-h-[200px]">
         <table className="w-full">
-          <thead className="sticky top-0 z-10">
-            <tr className="bg-secondary border-b border-border">
-              <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider">
-                Время
-              </th>
-              <th className="px-2 py-1.5 text-left text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider">
-                Фамилия
-              </th>
-              <th className="px-2 py-1.5 text-center text-[10px] font-semibold text-secondary-foreground uppercase tracking-wider w-16">
-                Действия
-              </th>
-            </tr>
-          </thead>
           <tbody className="bg-card divide-y divide-border">
             {(searchQuery ? filteredData : initialData).map((row, index, array) => {
               const isNewDay = index === 0 || array[index - 1].date !== row.date;
