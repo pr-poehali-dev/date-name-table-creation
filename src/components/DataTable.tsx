@@ -1274,6 +1274,7 @@ export const DataTable = () => {
 
     if (!draggedFromReserve && !draggedFromWeekend && !draggedFromOtherJobs && draggedItem) {
       const sourceRow = [...data1, ...data2].find(row => row.id === draggedId);
+      const isFromData1 = data1.some(row => row.id === draggedId);
       
       if (sourceRow) {
         if (draggedFromSecond && sourceRow.surname2) {
@@ -1285,16 +1286,19 @@ export const DataTable = () => {
               : row
           ));
           
-          setData1(data1.map(row => 
-            row.id === draggedId 
-              ? { ...row, surname2: '', color2: 'green', counter2: 0 }
-              : row
-          ));
-          setData2(data2.map(row => 
-            row.id === draggedId 
-              ? { ...row, surname2: '', color2: 'green', counter2: 0 }
-              : row
-          ));
+          if (isFromData1) {
+            setData1(data1.map(row => 
+              row.id === draggedId 
+                ? { ...row, surname2: '', color2: 'green', counter2: 0 }
+                : row
+            ));
+          } else {
+            setData2(data2.map(row => 
+              row.id === draggedId 
+                ? { ...row, surname2: '', color2: 'green', counter2: 0 }
+                : row
+            ));
+          }
         } else if (sourceRow.surname) {
           if (sourceRow.surname2) {
             setDataSet(dataSet.map(row => 
@@ -1312,16 +1316,19 @@ export const DataTable = () => {
             ));
           }
           
-          setData1(data1.map(row => 
-            row.id === draggedId 
-              ? { ...row, surname: '', color: 'red', counter: 0, surname2: '', color2: 'green', counter2: 0 }
-              : row
-          ));
-          setData2(data2.map(row => 
-            row.id === draggedId 
-              ? { ...row, surname: '', color: 'red', counter: 0, surname2: '', color2: 'green', counter2: 0 }
-              : row
-          ));
+          if (isFromData1) {
+            setData1(data1.map(row => 
+              row.id === draggedId 
+                ? { ...row, surname: '', color: 'red', counter: 0, surname2: '', color2: 'green', counter2: 0 }
+                : row
+            ));
+          } else {
+            setData2(data2.map(row => 
+              row.id === draggedId 
+                ? { ...row, surname: '', color: 'red', counter: 0, surname2: '', color2: 'green', counter2: 0 }
+                : row
+            ));
+          }
         }
       }
     }
