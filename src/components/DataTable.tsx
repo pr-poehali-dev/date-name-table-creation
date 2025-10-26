@@ -1377,7 +1377,7 @@ export const DataTable = () => {
         />
 
         <SingleTable 
-          title="ТАБЛИЦА 2"
+          title="Чернышевск"
           initialData={data2}
           onDataChange={setData2}
           searchQuery={searchQuery}
