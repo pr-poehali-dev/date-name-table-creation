@@ -325,6 +325,18 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             draggable={!editingCell}
                             onDragStart={(e) => handleDragStart(e, row.id)}
                             onDragEnd={onDragEnd}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (draggedId && draggedId !== row.id) {
+                                onDropToTable(row.id, null, false, draggedId, false);
+                              }
+                              onDragEnd();
+                            }}
                             className="cursor-move transition-colors font-medium flex items-center gap-1"
                           >
                             <Icon name="GripVertical" size={10} className="text-muted-foreground" />
@@ -333,11 +345,23 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               <span className={`text-${row.color}-700 font-semibold text-[11px]`}>{row.surname || '—'}</span>
                             </div>
                           </div>
-                          {row.surname2 && (
+                          {row.surname2 ? (
                             <div 
                               draggable={!editingCell}
                               onDragStart={(e) => handleDragStart2(e, row.id)}
                               onDragEnd={onDragEnd}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (draggedId && draggedId !== row.id) {
+                                  onDropToTable(row.id, null, false, draggedId, true);
+                                }
+                                onDragEnd();
+                              }}
                               className="cursor-move transition-colors font-medium flex items-center gap-1"
                             >
                               <Icon name="GripVertical" size={10} className="text-muted-foreground" />
@@ -345,6 +369,24 @@ const SingleTable: React.FC<SingleTableProps> = ({
                                 <span className={`text-[9px] font-mono font-bold ${(row.counter2 || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 1}</span>
                                 <span className={`text-${row.color2}-700 font-semibold text-[11px]`}>{row.surname2}</span>
                               </div>
+                            </div>
+                          ) : (
+                            <div 
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (draggedId && draggedId !== row.id) {
+                                  onDropToTable(row.id, null, false, draggedId, true);
+                                }
+                                onDragEnd();
+                              }}
+                              className="border-2 border-dashed border-muted-foreground/20 rounded px-4 py-0.5 min-w-[60px] text-center"
+                            >
+                              <span className="text-muted-foreground/40 text-[10px]">+</span>
                             </div>
                           )}
                         </div>
