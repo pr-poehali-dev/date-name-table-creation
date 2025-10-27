@@ -258,12 +258,34 @@ const SingleTable: React.FC<SingleTableProps> = ({
                         const draggedRow = initialData.find(r => r.id === draggedId);
                         if (draggedRow) {
                           if (draggedId !== row.id) {
-                            const draggedIndex = initialData.findIndex(r => r.id === draggedId);
-                            const targetIndex = initialData.findIndex(r => r.id === row.id);
-                            
-                            const newData = [...initialData];
-                            const [removed] = newData.splice(draggedIndex, 1);
-                            newData.splice(targetIndex, 0, removed);
+                            // Обмен только фамилиями, date/time остаются на месте
+                            const newData = initialData.map(r => {
+                              if (r.id === draggedId) {
+                                // В строку откуда тащим - ставим фамилии из целевой строки
+                                return {
+                                  ...r, // Сохраняем date, time, id
+                                  surname: row.surname,
+                                  color: row.color,
+                                  counter: row.counter || 0,
+                                  surname2: row.surname2 || '',
+                                  color2: row.color2 || 'green',
+                                  counter2: row.counter2 || 0
+                                };
+                              }
+                              if (r.id === row.id) {
+                                // В целевую строку - ставим фамилии из перетаскиваемой
+                                return {
+                                  ...r, // Сохраняем date, time, id
+                                  surname: draggedRow.surname,
+                                  color: draggedRow.color,
+                                  counter: draggedRow.counter || 0,
+                                  surname2: draggedRow.surname2 || '',
+                                  color2: draggedRow.color2 || 'green',
+                                  counter2: draggedRow.counter2 || 0
+                                };
+                              }
+                              return r;
+                            });
                             
                             onDataChange(newData);
                           }
