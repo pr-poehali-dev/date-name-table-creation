@@ -1397,23 +1397,39 @@ export const DataTable = () => {
       const isTargetInData1 = data1.some(row => row.id === targetId);
       const isSameTable = (isFromData1 && isTargetInData1) || (!isFromData1 && !isTargetInData1);
       
-      if (sourceRow && targetRow) {
+      if (sourceRow && targetRow && isSameTable) {
+        // Полный обмен строк местами внутри одной таблицы
+        setDataSet(dataSet.map(row => {
+          if (row.id === draggedId) {
+            return { ...targetRow };
+          }
+          if (row.id === targetId) {
+            return { ...sourceRow };
+          }
+          return row;
+        }));
+      } else if (sourceRow && targetRow) {
+        // Перенос между таблицами - только фамилии, дата/время остаются
+        // Перенос между таблицами - только фамилии
         if (draggedFromSecond && sourceRow.surname2) {
           const targetData = toSecondCell 
             ? { surname: targetRow.surname2, color: targetRow.color2, counter: targetRow.counter2 }
             : { surname: targetRow.surname, color: targetRow.color, counter: targetRow.counter };
           
-          if (isSameTable) {
+          setDataSet(dataSet.map(row => 
+            row.id === targetId 
+              ? toSecondCell 
+                ? { ...row, surname2: sourceRow.surname2, color2: sourceRow.color2 || 'green', counter2: sourceRow.counter2 || 0 }
+                : { ...row, surname: sourceRow.surname2, color: sourceRow.color2 || 'green', counter: sourceRow.cursor2 || 0 }
+              : row
+          ));
+          
+          if (isFromData1) {
             setDataSet(dataSet.map(row => {
               if (row.id === targetId) {
                 return toSecondCell 
                   ? { ...row, surname2: sourceRow.surname2, color2: sourceRow.color2 || 'green', counter2: sourceRow.counter2 || 0 }
                   : { ...row, surname: sourceRow.surname2, color: sourceRow.color2 || 'green', counter: sourceRow.counter2 || 0 };
-              }
-              if (row.id === draggedId) {
-                return toSecondCell
-                  ? { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 }
-                  : { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 };
               }
               return row;
             }));
