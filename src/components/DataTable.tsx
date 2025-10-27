@@ -1226,11 +1226,16 @@ export const DataTable = () => {
         const linkedItem = reserve.find(r => r.id === draggedReserveItem.linkedId);
         
         if (linkedItem) {
-          setDataSet(dataSet.map(row => 
-            row.id === targetId 
-              ? { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 }
-              : row
-          ));
+          setDataSet(dataSet.map(row => { 
+            if (row.id === targetId) {
+              if (row.surname2) {
+                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0 };
+              } else {
+                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 };
+              }
+            }
+            return row;
+          }));
           setReserve(reserve.filter(r => r.id !== draggedId && r.id !== draggedReserveItem.linkedId));
         } else {
           setDataSet(dataSet.map(row => 
@@ -1261,11 +1266,16 @@ export const DataTable = () => {
         const linkedItem = weekend.find(w => w.id === draggedWeekendItem.linkedId);
         
         if (linkedItem) {
-          setDataSet(dataSet.map(row => 
-            row.id === targetId 
-              ? { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 }
-              : row
-          ));
+          setDataSet(dataSet.map(row => { 
+            if (row.id === targetId) {
+              if (row.surname2) {
+                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0 };
+              } else {
+                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 };
+              }
+            }
+            return row;
+          }));
           setWeekend(weekend.filter(w => w.id !== draggedId && w.id !== draggedWeekendItem.linkedId));
         } else {
           setDataSet(dataSet.map(row => 
@@ -1296,11 +1306,16 @@ export const DataTable = () => {
         const linkedItem = otherJobs.find(o => o.id === draggedOtherJobsItem.linkedId);
         
         if (linkedItem) {
-          setDataSet(dataSet.map(row => 
-            row.id === targetId 
-              ? { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 }
-              : row
-          ));
+          setDataSet(dataSet.map(row => { 
+            if (row.id === targetId) {
+              if (row.surname2) {
+                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0 };
+              } else {
+                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 };
+              }
+            }
+            return row;
+          }));
           setOtherJobs(otherJobs.filter(o => o.id !== draggedId && o.id !== draggedOtherJobsItem.linkedId));
         } else {
           setDataSet(dataSet.map(row => 
