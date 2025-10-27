@@ -494,7 +494,7 @@ export const DataTable = () => {
   const [data2, setData2] = useState<TableRow[]>(getInitialData2);
   const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialReserve);
   const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialWeekend);
-  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>>(getInitialOtherJobs);
+  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialOtherJobs);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
