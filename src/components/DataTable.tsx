@@ -1263,6 +1263,7 @@ export const DataTable = () => {
               ? { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 }
               : row
           ));
+          setWeekend(weekend.filter(w => w.id !== draggedId && w.id !== draggedWeekendItem.linkedId));
         } else {
           setDataSet(dataSet.map(row => 
             row.id === targetId 
@@ -1271,6 +1272,7 @@ export const DataTable = () => {
                 : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0 }
               : row
           ));
+          setWeekend(weekend.filter(w => w.id !== draggedId));
         }
       } else {
         setDataSet(dataSet.map(row => 
@@ -1280,6 +1282,7 @@ export const DataTable = () => {
               : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem?.counter || 0 }
             : row
         ));
+        setWeekend(weekend.filter(w => w.id !== draggedId));
       }
     }
 
@@ -1295,6 +1298,7 @@ export const DataTable = () => {
               ? { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 }
               : row
           ));
+          setOtherJobs(otherJobs.filter(o => o.id !== draggedId && o.id !== draggedOtherJobsItem.linkedId));
         } else {
           setDataSet(dataSet.map(row => 
             row.id === targetId 
@@ -1303,6 +1307,7 @@ export const DataTable = () => {
                 : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0 }
               : row
           ));
+          setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
         }
       } else {
         setDataSet(dataSet.map(row => 
@@ -1312,6 +1317,7 @@ export const DataTable = () => {
               : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem?.counter || 0 }
             : row
         ));
+        setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
       }
     }
 
