@@ -1443,7 +1443,11 @@ export const DataTable = () => {
             if (isSameTable) {
               setDataSet(dataSet.map(row => {
                 if (row.id === targetId) {
-                  return { ...row, surname: sourceRow.surname, color: sourceRow.color, counter: sourceRow.counter || 0, surname2: sourceRow.surname2, color2: sourceRow.color2 || 'green', counter2: sourceRow.counter2 || 0 };
+                  if (row.surname2) {
+                    return { ...row, surname: sourceRow.surname, color: sourceRow.color, counter: sourceRow.counter || 0 };
+                  } else {
+                    return { ...row, surname: sourceRow.surname, color: sourceRow.color, counter: sourceRow.counter || 0, surname2: sourceRow.surname2, color2: sourceRow.color2 || 'green', counter2: sourceRow.counter2 || 0 };
+                  }
                 }
                 if (row.id === draggedId) {
                   return { ...row, surname: '', color: 'red', counter: 0, surname2: '', color2: 'green', counter2: 0 };
