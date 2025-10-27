@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
@@ -424,36 +424,77 @@ const generateThreeDaysData = (startDate: string, tablePrefix: string) => {
 export const DataTable = () => {
   const today = new Date().toISOString().split('T')[0];
   
-  const [data1, setData1] = useState<TableRow[]>(() => {
+  const getInitialData1 = () => {
+    const saved = localStorage.getItem('data1');
+    if (saved) {
+      return JSON.parse(saved);
+    }
     const generated = generateThreeDaysData(today, 't1');
     generated[0] = { ...generated[0], surname: 'Иванов', color: 'red', surname2: 'Петров', color2: 'blue' };
     generated[1] = { ...generated[1], surname: 'Петров', color: 'blue', surname2: '', color2: 'green' };
     generated[2] = { ...generated[2], surname: 'Сидоров', color: 'green', surname2: '', color2: 'green' };
     return generated;
-  });
+  };
 
-  const [data2, setData2] = useState<TableRow[]>(() => {
+  const getInitialData2 = () => {
+    const saved = localStorage.getItem('data2');
+    if (saved) {
+      return JSON.parse(saved);
+    }
     const generated = generateThreeDaysData(today, 't2');
     generated[0] = { ...generated[0], surname: 'Кузнецов', color: 'yellow' };
     generated[1] = { ...generated[1], surname: 'Смирнов', color: 'purple' };
     return generated;
-  });
-  
-  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
-    { id: 'r1', surname: 'Алексеев', color: 'red', counter: 1 },
-    { id: 'r2', surname: 'Новиков', color: 'blue', counter: 1 },
-    { id: 'r3', surname: 'Морозов', color: 'red', linkedId: 'r4', counter: 1 },
-    { id: 'r4', surname: 'Петров', color: 'blue', linkedId: 'r3', counter: 1 },
-  ]);
+  };
 
-  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
-    { id: 'w1', surname: 'Сидоров', color: 'blue', counter: 1 },
-    { id: 'w2', surname: 'Васильев', color: 'red', counter: 1 },
-  ]);
-  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>([
-    { id: 'o1', surname: 'Федоров', color: 'red', linkedId: 'o2', counter: 1 },
-    { id: 'o2', surname: 'Козлов', color: 'blue', linkedId: 'o1', counter: 1 },
-  ]);
+  const getInitialReserve = () => {
+    const saved = localStorage.getItem('reserve');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [
+      { id: 'r1', surname: 'Алексеев', color: 'red', counter: 1 },
+      { id: 'r2', surname: 'Новиков', color: 'blue', counter: 1 },
+      { id: 'r3', surname: 'Морозов', color: 'red', linkedId: 'r4', counter: 1 },
+      { id: 'r4', surname: 'Петров', color: 'blue', linkedId: 'r3', counter: 1 },
+    ];
+  };
+
+  const getInitialWeekend = () => {
+    const saved = localStorage.getItem('weekend');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [
+      { id: 'w1', surname: 'Сидоров', color: 'blue', counter: 1 },
+      { id: 'w2', surname: 'Васильев', color: 'red', counter: 1 },
+    ];
+  };
+
+  const getInitialOtherJobs = () => {
+    const saved = localStorage.getItem('otherJobs');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return [
+      { id: 'o1', surname: 'Федоров', color: 'red', linkedId: 'o2', counter: 1 },
+      { id: 'o2', surname: 'Козлов', color: 'blue', linkedId: 'o1', counter: 1 },
+    ];
+  };
+
+  const getInitialCounters = () => {
+    const saved = localStorage.getItem('surnameCounters');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return {};
+  };
+  
+  const [data1, setData1] = useState<TableRow[]>(getInitialData1);
+  const [data2, setData2] = useState<TableRow[]>(getInitialData2);
+  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialReserve);
+  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialWeekend);
+  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>>(getInitialOtherJobs);
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
@@ -476,8 +517,32 @@ export const DataTable = () => {
   const [draggedFromSecond, setDraggedFromSecond] = useState(false);
   const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
-  const [surnameCounters, setSurnameCounters] = useState<Record<string, number>>({});
+  const [surnameCounters, setSurnameCounters] = useState<Record<string, number>>(getInitialCounters);
   const [linkingMode, setLinkingMode] = useState<{ source: 'reserve' | 'weekend' | 'otherJobs'; id: string } | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('data1', JSON.stringify(data1));
+  }, [data1]);
+
+  useEffect(() => {
+    localStorage.setItem('data2', JSON.stringify(data2));
+  }, [data2]);
+
+  useEffect(() => {
+    localStorage.setItem('reserve', JSON.stringify(reserve));
+  }, [reserve]);
+
+  useEffect(() => {
+    localStorage.setItem('weekend', JSON.stringify(weekend));
+  }, [weekend]);
+
+  useEffect(() => {
+    localStorage.setItem('otherJobs', JSON.stringify(otherJobs));
+  }, [otherJobs]);
+
+  useEffect(() => {
+    localStorage.setItem('surnameCounters', JSON.stringify(surnameCounters));
+  }, [surnameCounters]);
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);
