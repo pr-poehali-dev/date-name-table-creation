@@ -1391,15 +1391,16 @@ export const DataTable = () => {
     }
 
     if (!draggedFromReserve && !draggedFromWeekend && !draggedFromOtherJobs && draggedItem) {
-      const sourceRow = dataSet.find(row => row.id === draggedId);
-      const targetRow = dataSet.find(row => row.id === targetId);
+      const allRows = [...data1, ...data2];
+      const sourceRow = allRows.find(row => row.id === draggedId);
+      const targetRow = allRows.find(row => row.id === targetId);
       const isFromData1 = data1.some(row => row.id === draggedId);
       const isTargetInData1 = data1.some(row => row.id === targetId);
       const isSameTable = (isFromData1 && isTargetInData1) || (!isFromData1 && !isTargetInData1);
       
       if (sourceRow && targetRow && isSameTable) {
         // Обмен только фамилиями, date/time остаются на месте
-        setDataSet(dataSet.map(row => {
+        const updatedData = dataSet.map(row => {
           if (row.id === draggedId) {
             // В исходную строку (с её date/time) помещаем фамилии из целевой
             return { 
@@ -1425,7 +1426,8 @@ export const DataTable = () => {
             };
           }
           return row;
-        }));
+        });
+        setDataSet(updatedData);
       } else if (sourceRow && targetRow) {
         // Перенос между таблицами - только фамилии, дата/время остаются
         // Перенос между таблицами - только фамилии
