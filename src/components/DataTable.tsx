@@ -424,7 +424,7 @@ const generateThreeDaysData = (startDate: string, tablePrefix: string) => {
 export const DataTable = () => {
   const today = new Date().toISOString().split('T')[0];
   
-  const getInitialData1 = () => {
+  const [data1, setData1] = useState<TableRow[]>(() => {
     const saved = localStorage.getItem('data1');
     if (saved) {
       return JSON.parse(saved);
@@ -434,9 +434,9 @@ export const DataTable = () => {
     generated[1] = { ...generated[1], surname: 'Петров', color: 'blue', surname2: '', color2: 'green' };
     generated[2] = { ...generated[2], surname: 'Сидоров', color: 'green', surname2: '', color2: 'green' };
     return generated;
-  };
+  });
 
-  const getInitialData2 = () => {
+  const [data2, setData2] = useState<TableRow[]>(() => {
     const saved = localStorage.getItem('data2');
     if (saved) {
       return JSON.parse(saved);
@@ -445,9 +445,9 @@ export const DataTable = () => {
     generated[0] = { ...generated[0], surname: 'Кузнецов', color: 'yellow' };
     generated[1] = { ...generated[1], surname: 'Смирнов', color: 'purple' };
     return generated;
-  };
+  });
 
-  const getInitialReserve = () => {
+  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(() => {
     const saved = localStorage.getItem('reserve');
     if (saved) {
       return JSON.parse(saved);
@@ -458,9 +458,9 @@ export const DataTable = () => {
       { id: 'r3', surname: 'Морозов', color: 'red', linkedId: 'r4', counter: 1 },
       { id: 'r4', surname: 'Петров', color: 'blue', linkedId: 'r3', counter: 1 },
     ];
-  };
+  });
 
-  const getInitialWeekend = () => {
+  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(() => {
     const saved = localStorage.getItem('weekend');
     if (saved) {
       return JSON.parse(saved);
@@ -469,9 +469,9 @@ export const DataTable = () => {
       { id: 'w1', surname: 'Сидоров', color: 'blue', counter: 1 },
       { id: 'w2', surname: 'Васильев', color: 'red', counter: 1 },
     ];
-  };
+  });
 
-  const getInitialOtherJobs = () => {
+  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(() => {
     const saved = localStorage.getItem('otherJobs');
     if (saved) {
       return JSON.parse(saved);
@@ -480,21 +480,7 @@ export const DataTable = () => {
       { id: 'o1', surname: 'Федоров', color: 'red', linkedId: 'o2', counter: 1 },
       { id: 'o2', surname: 'Козлов', color: 'blue', linkedId: 'o1', counter: 1 },
     ];
-  };
-
-  const getInitialCounters = () => {
-    const saved = localStorage.getItem('surnameCounters');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    return {};
-  };
-  
-  const [data1, setData1] = useState<TableRow[]>(getInitialData1);
-  const [data2, setData2] = useState<TableRow[]>(getInitialData2);
-  const [reserve, setReserve] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialReserve);
-  const [weekend, setWeekend] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialWeekend);
-  const [otherJobs, setOtherJobs] = useState<Array<{id: string; surname: string; color: string; linkedId?: string; counter?: number}>>(getInitialOtherJobs);
+  });
   
   const [draggedFromReserve, setDraggedFromReserve] = useState(false);
   const [draggedFromWeekend, setDraggedFromWeekend] = useState(false);
@@ -517,7 +503,13 @@ export const DataTable = () => {
   const [draggedFromSecond, setDraggedFromSecond] = useState(false);
   const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
-  const [surnameCounters, setSurnameCounters] = useState<Record<string, number>>(getInitialCounters);
+  const [surnameCounters, setSurnameCounters] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('surnameCounters');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return {};
+  });
   const [linkingMode, setLinkingMode] = useState<{ source: 'reserve' | 'weekend' | 'otherJobs'; id: string } | null>(null);
 
   useEffect(() => {
