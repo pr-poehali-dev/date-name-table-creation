@@ -1675,6 +1675,22 @@ export const DataTable = () => {
                               {item.surname}
                             </span>
                           </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (item.linkedId) {
+                                setWeekend(weekend.filter(w => w.id !== item.id && w.id !== item.linkedId));
+                              } else {
+                                setWeekend(weekend.filter(w => w.id !== item.id));
+                              }
+                            }}
+                            className="h-5 w-5 p-0 hover:bg-destructive/10"
+                            title="Удалить"
+                          >
+                            <Icon name="Trash2" size={10} className="text-muted-foreground hover:text-destructive" />
+                          </Button>
                           {!linkedItem && (
                             <Button
                               size="sm"
