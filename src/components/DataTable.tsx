@@ -513,28 +513,52 @@ export const DataTable = () => {
   const [linkingMode, setLinkingMode] = useState<{ source: 'reserve' | 'weekend' | 'otherJobs'; id: string } | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('data1', JSON.stringify(data1));
-  }, [data1]);
+    const loadData = async () => {
+      try {
+        const response = await fetch('https://functions.poehali.dev/1d969b76-c527-4ad7-8b02-d60c191e1c38');
+        const result = await response.json();
+        
+        if (result.data && Object.keys(result.data).length > 0) {
+          if (result.data.data1) setData1(result.data.data1);
+          if (result.data.data2) setData2(result.data.data2);
+          if (result.data.reserve) setReserve(result.data.reserve);
+          if (result.data.weekend) setWeekend(result.data.weekend);
+          if (result.data.otherJobs) setOtherJobs(result.data.otherJobs);
+          if (result.data.surnameCounters) setSurnameCounters(result.data.surnameCounters);
+        }
+      } catch (error) {
+        console.error('Failed to load data:', error);
+      }
+    };
+    
+    loadData();
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('data2', JSON.stringify(data2));
-  }, [data2]);
-
-  useEffect(() => {
-    localStorage.setItem('reserve', JSON.stringify(reserve));
-  }, [reserve]);
-
-  useEffect(() => {
-    localStorage.setItem('weekend', JSON.stringify(weekend));
-  }, [weekend]);
-
-  useEffect(() => {
-    localStorage.setItem('otherJobs', JSON.stringify(otherJobs));
-  }, [otherJobs]);
-
-  useEffect(() => {
-    localStorage.setItem('surnameCounters', JSON.stringify(surnameCounters));
-  }, [surnameCounters]);
+    const saveData = async () => {
+      try {
+        await fetch('https://functions.poehali.dev/1d969b76-c527-4ad7-8b02-d60c191e1c38', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            data: {
+              data1,
+              data2,
+              reserve,
+              weekend,
+              otherJobs,
+              surnameCounters
+            }
+          })
+        });
+      } catch (error) {
+        console.error('Failed to save data:', error);
+      }
+    };
+    
+    const timeoutId = setTimeout(saveData, 500);
+    return () => clearTimeout(timeoutId);
+  }, [data1, data2, reserve, weekend, otherJobs, surnameCounters]);
 
   const handleReserveDragStart = (e: React.DragEvent, id: string) => {
     const item = reserve.find(r => r.id === id);

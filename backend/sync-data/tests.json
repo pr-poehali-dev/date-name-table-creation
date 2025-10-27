@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Get initial data",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "data": "object"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Save data",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "data": {
+          "test": "value"
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
