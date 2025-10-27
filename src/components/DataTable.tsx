@@ -1221,12 +1221,13 @@ export const DataTable = () => {
 
     if (draggedFromReserve && draggedItem) {
       const draggedReserveItem = reserve.find(r => r.id === draggedId);
+      const isTargetInData1 = data1.some(row => row.id === targetId);
       
       if (draggedReserveItem?.linkedId) {
         const linkedItem = reserve.find(r => r.id === draggedReserveItem.linkedId);
         
         if (linkedItem) {
-          setDataSet(dataSet.map(row => { 
+          const updateRow = (row: any) => {
             if (row.id === targetId) {
               if (row.surname2) {
                 return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0 };
@@ -1235,38 +1236,55 @@ export const DataTable = () => {
               }
             }
             return row;
-          }));
+          };
+          
+          if (isTargetInData1) {
+            setData1(data1.map(updateRow));
+          } else {
+            setData2(data2.map(updateRow));
+          }
           setReserve(reserve.filter(r => r.id !== draggedId && r.id !== draggedReserveItem.linkedId));
         } else {
-          setDataSet(dataSet.map(row => 
+          const updateRow = (row: any) =>
             row.id === targetId 
               ? toSecondCell 
                 ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedReserveItem.counter || 0 }
                 : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0 }
-              : row
-          ));
+              : row;
+          
+          if (isTargetInData1) {
+            setData1(data1.map(updateRow));
+          } else {
+            setData2(data2.map(updateRow));
+          }
           setReserve(reserve.filter(r => r.id !== draggedId));
         }
       } else {
-        setDataSet(dataSet.map(row => 
+        const updateRow = (row: any) =>
           row.id === targetId 
             ? toSecondCell 
               ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedReserveItem?.counter || 0 }
               : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem?.counter || 0 }
-            : row
-        ));
+            : row;
+        
+        if (isTargetInData1) {
+          setData1(data1.map(updateRow));
+        } else {
+          setData2(data2.map(updateRow));
+        }
         setReserve(reserve.filter(r => r.id !== draggedId));
       }
     }
 
     if (draggedFromWeekend && draggedItem) {
       const draggedWeekendItem = weekend.find(w => w.id === draggedId);
+      const isTargetInData1 = data1.some(row => row.id === targetId);
       
       if (draggedWeekendItem?.linkedId) {
         const linkedItem = weekend.find(w => w.id === draggedWeekendItem.linkedId);
         
         if (linkedItem) {
-          setDataSet(dataSet.map(row => { 
+          const updateRow = (row: any) => {
             if (row.id === targetId) {
               if (row.surname2) {
                 return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0 };
@@ -1275,38 +1293,55 @@ export const DataTable = () => {
               }
             }
             return row;
-          }));
+          };
+          
+          if (isTargetInData1) {
+            setData1(data1.map(updateRow));
+          } else {
+            setData2(data2.map(updateRow));
+          }
           setWeekend(weekend.filter(w => w.id !== draggedId && w.id !== draggedWeekendItem.linkedId));
         } else {
-          setDataSet(dataSet.map(row => 
+          const updateRow = (row: any) =>
             row.id === targetId 
               ? toSecondCell 
                 ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedWeekendItem.counter || 0 }
                 : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0 }
-              : row
-          ));
+              : row;
+          
+          if (isTargetInData1) {
+            setData1(data1.map(updateRow));
+          } else {
+            setData2(data2.map(updateRow));
+          }
           setWeekend(weekend.filter(w => w.id !== draggedId));
         }
       } else {
-        setDataSet(dataSet.map(row => 
+        const updateRow = (row: any) =>
           row.id === targetId 
             ? toSecondCell 
               ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedWeekendItem?.counter || 0 }
               : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem?.counter || 0 }
-            : row
-        ));
+            : row;
+        
+        if (isTargetInData1) {
+          setData1(data1.map(updateRow));
+        } else {
+          setData2(data2.map(updateRow));
+        }
         setWeekend(weekend.filter(w => w.id !== draggedId));
       }
     }
 
     if (draggedFromOtherJobs && draggedItem) {
       const draggedOtherJobsItem = otherJobs.find(o => o.id === draggedId);
+      const isTargetInData1 = data1.some(row => row.id === targetId);
       
       if (draggedOtherJobsItem?.linkedId) {
         const linkedItem = otherJobs.find(o => o.id === draggedOtherJobsItem.linkedId);
         
         if (linkedItem) {
-          setDataSet(dataSet.map(row => { 
+          const updateRow = (row: any) => {
             if (row.id === targetId) {
               if (row.surname2) {
                 return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0 };
@@ -1315,26 +1350,42 @@ export const DataTable = () => {
               }
             }
             return row;
-          }));
+          };
+          
+          if (isTargetInData1) {
+            setData1(data1.map(updateRow));
+          } else {
+            setData2(data2.map(updateRow));
+          }
           setOtherJobs(otherJobs.filter(o => o.id !== draggedId && o.id !== draggedOtherJobsItem.linkedId));
         } else {
-          setDataSet(dataSet.map(row => 
+          const updateRow = (row: any) =>
             row.id === targetId 
               ? toSecondCell 
                 ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedOtherJobsItem.counter || 0 }
                 : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0 }
-              : row
-          ));
+              : row;
+          
+          if (isTargetInData1) {
+            setData1(data1.map(updateRow));
+          } else {
+            setData2(data2.map(updateRow));
+          }
           setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
         }
       } else {
-        setDataSet(dataSet.map(row => 
+        const updateRow = (row: any) =>
           row.id === targetId 
             ? toSecondCell 
               ? { ...row, surname2: draggedItem.surname, color2: draggedItem.color, counter2: draggedOtherJobsItem?.counter || 0 }
               : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem?.counter || 0 }
-            : row
-        ));
+            : row;
+        
+        if (isTargetInData1) {
+          setData1(data1.map(updateRow));
+        } else {
+          setData2(data2.map(updateRow));
+        }
         setOtherJobs(otherJobs.filter(o => o.id !== draggedId));
       }
     }
