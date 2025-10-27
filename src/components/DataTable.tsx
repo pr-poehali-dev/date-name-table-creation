@@ -1398,13 +1398,31 @@ export const DataTable = () => {
       const isSameTable = (isFromData1 && isTargetInData1) || (!isFromData1 && !isTargetInData1);
       
       if (sourceRow && targetRow && isSameTable) {
-        // Полный обмен строк местами внутри одной таблицы
+        // Обмен только фамилиями, date/time остаются на месте
         setDataSet(dataSet.map(row => {
           if (row.id === draggedId) {
-            return { ...targetRow };
+            // В исходную строку помещаем фамилии из целевой
+            return { 
+              ...row, 
+              surname: targetRow.surname, 
+              color: targetRow.color, 
+              counter: targetRow.counter || 0,
+              surname2: targetRow.surname2 || '',
+              color2: targetRow.color2 || 'green',
+              counter2: targetRow.counter2 || 0
+            };
           }
           if (row.id === targetId) {
-            return { ...sourceRow };
+            // В целевую строку помещаем фамилии из исходной
+            return { 
+              ...row, 
+              surname: sourceRow.surname, 
+              color: sourceRow.color, 
+              counter: sourceRow.counter || 0,
+              surname2: sourceRow.surname2 || '',
+              color2: sourceRow.color2 || 'green',
+              counter2: sourceRow.counter2 || 0
+            };
           }
           return row;
         }));
