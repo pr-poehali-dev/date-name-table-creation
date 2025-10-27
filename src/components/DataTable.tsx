@@ -1411,7 +1411,9 @@ export const DataTable = () => {
                   : { ...row, surname: sourceRow.surname2, color: sourceRow.color2 || 'green', counter: sourceRow.counter2 || 0 };
               }
               if (row.id === draggedId) {
-                return { ...row, surname2: '', color2: 'green', counter2: 0 };
+                return toSecondCell
+                  ? { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 }
+                  : { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 };
               }
               return row;
             }));
@@ -1427,13 +1429,17 @@ export const DataTable = () => {
             if (isFromData1) {
               setData1(data1.map(row => 
                 row.id === draggedId 
-                  ? { ...row, surname2: '', color2: 'green', counter2: 0 }
+                  ? toSecondCell
+                    ? { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 }
+                    : { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 }
                   : row
               ));
             } else {
               setData2(data2.map(row => 
                 row.id === draggedId 
-                  ? { ...row, surname2: '', color2: 'green', counter2: 0 }
+                  ? toSecondCell
+                    ? { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 }
+                    : { ...row, surname2: targetData.surname || '', color2: targetData.color || 'green', counter2: targetData.counter || 0 }
                   : row
               ));
             }
@@ -1450,7 +1456,9 @@ export const DataTable = () => {
                   }
                 }
                 if (row.id === draggedId) {
-                  return { ...row, surname: '', color: 'red', counter: 0, surname2: '', color2: 'green', counter2: 0 };
+                  return row.surname2
+                    ? { ...row, surname: targetRow.surname, color: targetRow.color, counter: targetRow.counter || 0 }
+                    : { ...row, surname: targetRow.surname, color: targetRow.color, counter: targetRow.counter || 0, surname2: targetRow.surname2 || '', color2: targetRow.color2 || 'green', counter2: targetRow.counter2 || 0 };
                 }
                 return row;
               }));
@@ -1489,7 +1497,9 @@ export const DataTable = () => {
                     : { ...row, surname: sourceRow.surname, color: sourceRow.color, counter: sourceRow.counter || 0 };
                 }
                 if (row.id === draggedId) {
-                  return { ...row, surname: '', color: 'red', counter: 0, surname2: '', color2: 'green', counter2: 0 };
+                  return toSecondCell
+                    ? { ...row, surname: targetRow.surname2 || '', color: targetRow.color2 || 'red', counter: targetRow.counter2 || 0 }
+                    : { ...row, surname: targetRow.surname || '', color: targetRow.color || 'red', counter: targetRow.counter || 0 };
                 }
                 return row;
               }));
