@@ -1251,11 +1251,16 @@ export const DataTable = () => {
         if (linkedItem) {
           const updateRow = (row: any) => {
             if (row.id === targetId) {
-              if (row.surname2) {
-                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0 };
-              } else {
-                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 };
-              }
+              // Всегда добавляем обе связанные фамилии
+              return { 
+                ...row, 
+                surname: draggedItem.surname, 
+                color: draggedItem.color, 
+                counter: draggedReserveItem.counter || 0,
+                surname2: linkedItem.surname, 
+                color2: linkedItem.color, 
+                counter2: linkedItem.counter || 0 
+              };
             }
             return row;
           };
@@ -1308,11 +1313,16 @@ export const DataTable = () => {
         if (linkedItem) {
           const updateRow = (row: any) => {
             if (row.id === targetId) {
-              if (row.surname2) {
-                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0 };
-              } else {
-                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedWeekendItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 };
-              }
+              // Всегда добавляем обе связанные фамилии
+              return { 
+                ...row, 
+                surname: draggedItem.surname, 
+                color: draggedItem.color, 
+                counter: draggedWeekendItem.counter || 0,
+                surname2: linkedItem.surname, 
+                color2: linkedItem.color, 
+                counter2: linkedItem.counter || 0 
+              };
             }
             return row;
           };
@@ -1365,11 +1375,16 @@ export const DataTable = () => {
         if (linkedItem) {
           const updateRow = (row: any) => {
             if (row.id === targetId) {
-              if (row.surname2) {
-                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0 };
-              } else {
-                return { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedOtherJobsItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 };
-              }
+              // Всегда добавляем обе связанные фамилии
+              return { 
+                ...row, 
+                surname: draggedItem.surname, 
+                color: draggedItem.color, 
+                counter: draggedOtherJobsItem.counter || 0,
+                surname2: linkedItem.surname, 
+                color2: linkedItem.color, 
+                counter2: linkedItem.counter || 0 
+              };
             }
             return row;
           };
