@@ -1420,7 +1420,7 @@ export const DataTable = () => {
             row.id === targetId 
               ? toSecondCell 
                 ? { ...row, surname2: sourceRow.surname2, color2: sourceRow.color2 || 'green', counter2: sourceRow.counter2 || 0 }
-                : { ...row, surname: sourceRow.surname2, color: sourceRow.color2 || 'green', counter: sourceRow.cursor2 || 0 }
+                : { ...row, surname: sourceRow.surname2, color: sourceRow.color2 || 'green', counter: sourceRow.counter2 || 0 }
               : row
           ));
           
