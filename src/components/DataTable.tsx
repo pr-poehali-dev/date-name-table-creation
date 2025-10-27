@@ -1400,11 +1400,16 @@ export const DataTable = () => {
                 return row;
               }));
             } else {
-              setDataSet(dataSet.map(row => 
-                row.id === targetId 
-                  ? { ...row, surname: sourceRow.surname, color: sourceRow.color, counter: sourceRow.counter || 0, surname2: sourceRow.surname2, color2: sourceRow.color2 || 'green', counter2: sourceRow.counter2 || 0 }
-                  : row
-              ));
+              setDataSet(dataSet.map(row => {
+                if (row.id === targetId) {
+                  if (row.surname2) {
+                    return { ...row, surname: sourceRow.surname, color: sourceRow.color, counter: sourceRow.counter || 0 };
+                  } else {
+                    return { ...row, surname: sourceRow.surname, color: sourceRow.color, counter: sourceRow.counter || 0, surname2: sourceRow.surname2, color2: sourceRow.color2 || 'green', counter2: sourceRow.counter2 || 0 };
+                  }
+                }
+                return row;
+              }));
               
               if (isFromData1) {
                 setData1(data1.map(row => 
