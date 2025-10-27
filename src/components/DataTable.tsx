@@ -1231,6 +1231,7 @@ export const DataTable = () => {
               ? { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0, surname2: linkedItem.surname, color2: linkedItem.color, counter2: linkedItem.counter || 0 }
               : row
           ));
+          setReserve(reserve.filter(r => r.id !== draggedId && r.id !== draggedReserveItem.linkedId));
         } else {
           setDataSet(dataSet.map(row => 
             row.id === targetId 
@@ -1239,6 +1240,7 @@ export const DataTable = () => {
                 : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem.counter || 0 }
               : row
           ));
+          setReserve(reserve.filter(r => r.id !== draggedId));
         }
       } else {
         setDataSet(dataSet.map(row => 
@@ -1248,6 +1250,7 @@ export const DataTable = () => {
               : { ...row, surname: draggedItem.surname, color: draggedItem.color, counter: draggedReserveItem?.counter || 0 }
             : row
         ));
+        setReserve(reserve.filter(r => r.id !== draggedId));
       }
     }
 
