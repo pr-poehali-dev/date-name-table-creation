@@ -205,23 +205,23 @@ const SingleTable: React.FC<SingleTableProps> = ({
 
   return (
     <Card className="flex-1 overflow-hidden resize-x min-w-[300px] max-w-full">
-      <div className="bg-secondary p-2">
+      <div className="bg-secondary p-1">
         <div className="flex items-center justify-between">
-          <h1 className="text-sm font-bold text-secondary-foreground tracking-tight">
+          <h1 className="text-xs font-bold text-secondary-foreground tracking-tight">
             {title}
           </h1>
           <Button 
             onClick={handleAdd}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground h-6 text-xs"
+            className="bg-accent hover:bg-accent/90 text-accent-foreground h-5 text-[10px]"
             size="sm"
           >
-            <Icon name="Plus" size={12} className="mr-1" />
+            <Icon name="Plus" size={10} className="mr-0.5" />
             Добавить
           </Button>
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[calc(100vh-120px)] overflow-y-auto">
+      <div className="overflow-x-auto max-h-[calc(100vh-60px)] overflow-y-auto">
         <table className="w-full">
           <tbody className="bg-card divide-y divide-border">
             {(searchQuery ? filteredData : initialData).map((row, index, array) => {
@@ -231,10 +231,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
                 <React.Fragment key={`fragment-${row.id}`}>
                   {isNewDay && (
                     <tr key={`date-${row.date}-${index}`} className="sticky top-0 z-10">
-                      <td colSpan={3} className="bg-secondary px-2 py-0.5">
-                        <div className="flex items-center gap-1">
-                          <Icon name="Calendar" size={10} className="text-secondary-foreground" />
-                          <span className="font-semibold text-[9px] text-secondary-foreground">
+                      <td colSpan={3} className="bg-secondary px-1.5 py-0">
+                        <div className="flex items-center gap-0.5">
+                          <Icon name="Calendar" size={8} className="text-secondary-foreground" />
+                          <span className="font-semibold text-[8px] text-secondary-foreground">
                             {new Date(row.date).toLocaleDateString('ru-RU', { 
                               weekday: 'short', 
                               month: 'short', 
@@ -296,10 +296,10 @@ const SingleTable: React.FC<SingleTableProps> = ({
                       onDragEnd();
                     }}
                   >
-                    <td className="px-1.5 py-0">
+                    <td className="px-1 py-0">
                       {editingCell?.id === row.id && editingCell.field === 'time' ? (
                         <Select value={editValue} onValueChange={setEditValue}>
-                          <SelectTrigger className="max-w-xs h-6 text-xs">
+                          <SelectTrigger className="max-w-xs h-5 text-[9px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -311,12 +311,12 @@ const SingleTable: React.FC<SingleTableProps> = ({
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="text-foreground font-mono font-bold text-[10px]">
+                        <div className="text-foreground font-mono font-bold text-[9px]">
                           {row.time}
                         </div>
                       )}
                     </td>
-                    <td className="px-1.5 py-0">
+                    <td className="px-1 py-0">
                       {editingCell?.id === row.id && editingCell.field === 'surname' ? (
                         <Input
                           type="text"
@@ -326,7 +326,7 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             if (e.key === 'Enter') handleSave();
                             if (e.key === 'Escape') handleCancel();
                           }}
-                          className="max-w-xs text-sm"
+                          className="max-w-xs text-[10px] h-5"
                           autoFocus
                         />
                       ) : editingCell?.id === row.id && editingCell.field === 'surname2' ? (
@@ -338,21 +338,21 @@ const SingleTable: React.FC<SingleTableProps> = ({
                             if (e.key === 'Enter') handleSave();
                             if (e.key === 'Escape') handleCancel();
                           }}
-                          className="max-w-xs text-sm"
+                          className="max-w-xs text-[10px] h-5"
                           autoFocus
                         />
                       ) : (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <div 
                             draggable={!editingCell}
                             onDragStart={(e) => handleDragStart(e, row.id)}
                             onDragEnd={onDragEnd}
-                            className="cursor-move transition-colors font-medium flex items-center gap-1"
+                            className="cursor-move transition-colors font-medium flex items-center gap-0.5"
                           >
-                            <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                            <div className={`border border-${row.color}-500 rounded px-2 py-0.5 bg-${row.color}-50 hover:bg-${row.color}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
-                              <span className={`text-[9px] font-mono font-bold ${(row.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 1}</span>
-                              <span className={`text-${row.color}-700 font-semibold text-[11px]`}>{row.surname || '—'}</span>
+                            <Icon name="GripVertical" size={8} className="text-muted-foreground" />
+                            <div className={`border border-${row.color}-500 rounded px-1.5 py-0 bg-${row.color}-50 hover:bg-${row.color}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
+                              <span className={`text-[8px] font-mono font-bold ${(row.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter || 1}</span>
+                              <span className={`text-${row.color}-700 font-semibold text-[10px]`}>{row.surname || '—'}</span>
                             </div>
                           </div>
                           {row.surname2 && (
@@ -360,19 +360,19 @@ const SingleTable: React.FC<SingleTableProps> = ({
                               draggable={!editingCell}
                               onDragStart={(e) => handleDragStart2(e, row.id)}
                               onDragEnd={onDragEnd}
-                              className="cursor-move transition-colors font-medium flex items-center gap-1"
+                              className="cursor-move transition-colors font-medium flex items-center gap-0.5"
                             >
-                              <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                              <div className={`border border-${row.color2}-500 rounded px-2 py-0.5 bg-${row.color2}-50 hover:bg-${row.color2}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
-                                <span className={`text-[9px] font-mono font-bold ${(row.counter2 || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 1}</span>
-                                <span className={`text-${row.color2}-700 font-semibold text-[11px]`}>{row.surname2}</span>
+                              <Icon name="GripVertical" size={8} className="text-muted-foreground" />
+                              <div className={`border border-${row.color2}-500 rounded px-1.5 py-0 bg-${row.color2}-50 hover:bg-${row.color2}-100 transition-colors shadow-sm flex items-center gap-0.5`}>
+                                <span className={`text-[8px] font-mono font-bold ${(row.counter2 || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{row.counter2 || 1}</span>
+                                <span className={`text-${row.color2}-700 font-semibold text-[10px]`}>{row.surname2}</span>
                               </div>
                             </div>
                           )}
                         </div>
                       )}
                     </td>
-                    <td className="px-1.5 py-0">
+                    <td className="px-1 py-0">
                       <div className="flex items-center justify-center gap-1">
                         {editingCell?.id === row.id ? (
                           <>
@@ -1702,16 +1702,16 @@ export const DataTable = () => {
           onDragLeave={handleReserveDragLeave}
           onDrop={handleDropToReserve}
         >
-          <div className="bg-secondary p-2 space-y-2">
-            <div className="flex items-center gap-1.5">
-              <Icon name="Users" size={14} className="text-secondary-foreground" />
-              <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
+          <div className="bg-secondary p-1 space-y-1">
+            <div className="flex items-center gap-1">
+              <Icon name="Users" size={10} className="text-secondary-foreground" />
+              <h2 className="text-[10px] font-bold text-secondary-foreground tracking-tight">
                 В работе
               </h2>
             </div>
           </div>
 
-          <div className="p-2 space-y-1.5 max-h-[calc(100vh-120px)] overflow-y-auto">
+          <div className="p-1.5 space-y-1 max-h-[calc(100vh-60px)] overflow-y-auto">
             {filteredReserve.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground">
                 <Icon name="UserX" size={20} className="mx-auto mb-2 opacity-20" />
@@ -1731,11 +1731,11 @@ export const DataTable = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div 
-                        className={`border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 flex-1 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
+                        className={`border border-${item.color}-500 rounded px-1.5 py-0.5 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 flex-1 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'reserve' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                       >
-                        <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                        <span className={`text-[9px] font-mono font-bold mr-0.5 ${(item.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 1}</span>
-                        <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
+                        <Icon name="GripVertical" size={8} className="text-muted-foreground" />
+                        <span className={`text-[8px] font-mono font-bold mr-0.5 ${(item.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 1}</span>
+                        <span className={`text-${item.color}-700 font-semibold text-[10px]`}>
                           {item.surname}
                         </span>
                       </div>
@@ -1767,9 +1767,9 @@ export const DataTable = () => {
                           >
                             <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
-                          <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
-                            <span className={`text-[9px] font-mono font-bold mr-0.5 ${(linkedItem.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 1}</span>
-                            <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
+                          <div className={`border border-${linkedItem.color}-500 rounded px-1.5 py-0.5 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
+                            <span className={`text-[8px] font-mono font-bold mr-0.5 ${(linkedItem.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 1}</span>
+                            <span className={`text-${linkedItem.color}-700 font-semibold text-[10px]`}>
                               {linkedItem.surname}
                             </span>
                           </div>
@@ -1793,11 +1793,11 @@ export const DataTable = () => {
           onDragLeave={handleWeekendDragLeave}
           onDrop={handleDropToWeekend}
         >
-          <div className="bg-secondary p-2 space-y-2">
+          <div className="bg-secondary p-1 space-y-1">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon name="CalendarOff" size={14} className="text-secondary-foreground" />
-                <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
+              <div className="flex items-center gap-1">
+                <Icon name="CalendarOff" size={10} className="text-secondary-foreground" />
+                <h2 className="text-[10px] font-bold text-secondary-foreground tracking-tight">
                   Отсутствуют
                 </h2>
               </div>
@@ -1869,12 +1869,12 @@ export const DataTable = () => {
             )}
           </div>
 
-          <div className="p-2 space-y-1.5 max-h-[calc(100vh-120px)] overflow-y-auto">
+          <div className="p-1.5 space-y-1 max-h-[calc(100vh-60px)] overflow-y-auto">
             {filteredWeekend.length === 0 ? (
-              <div className="text-center py-4 text-muted-foreground">
-                <Icon name="CalendarX" size={20} className="mx-auto mb-2 opacity-20" />
-                <p className="text-[10px]">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
-                <p className="text-[10px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
+              <div className="text-center py-2 text-muted-foreground">
+                <Icon name="CalendarX" size={16} className="mx-auto mb-1 opacity-20" />
+                <p className="text-[9px]">{searchQuery ? 'Ничего не найдено' : 'Список пуст'}</p>
+                <p className="text-[9px] mt-0.5">{searchQuery ? 'Попробуйте другой запрос' : 'Перетащите сюда фамилии'}</p>
               </div>
             ) : (
               filteredWeekend.map((item) => {
@@ -1991,16 +1991,16 @@ export const DataTable = () => {
           onDragLeave={handleOtherJobsDragLeave}
           onDrop={handleDropToOtherJobs}
         >
-          <div className="bg-secondary p-2 space-y-2">
-            <div className="flex items-center gap-2">
-              <Icon name="Briefcase" size={14} className="text-secondary-foreground" />
-              <h2 className="text-xs font-bold text-secondary-foreground tracking-tight">
+          <div className="bg-secondary p-1 space-y-1">
+            <div className="flex items-center gap-1">
+              <Icon name="Briefcase" size={10} className="text-secondary-foreground" />
+              <h2 className="text-[10px] font-bold text-secondary-foreground tracking-tight">
                 Другие работы
               </h2>
             </div>
           </div>
 
-          <div className="p-2 space-y-1.5 max-h-[calc(100vh-120px)] overflow-y-auto">
+          <div className="p-1.5 space-y-1 max-h-[calc(100vh-60px)] overflow-y-auto">
             {filteredOtherJobs.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground">
                 <Icon name="BriefcaseX" size={20} className="mx-auto mb-2 opacity-20" />
@@ -2020,11 +2020,11 @@ export const DataTable = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div 
-                        className={`flex-1 border border-${item.color}-500 rounded px-2 py-1 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
+                        className={`flex-1 border border-${item.color}-500 rounded px-1.5 py-0.5 bg-${item.color}-50 hover:bg-${item.color}-100 transition-all duration-200 shadow-sm cursor-move flex items-center gap-0.5 hover:scale-105 hover:shadow-md ${linkingMode?.source === 'otherJobs' && linkingMode.id === item.id ? 'ring-2 ring-accent scale-105' : ''}`}
                       >
-                        <Icon name="GripVertical" size={10} className="text-muted-foreground" />
-                        <span className={`text-[9px] font-mono font-bold mr-1 ${(item.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 1}</span>
-                        <span className={`text-${item.color}-700 font-semibold text-[11px]`}>
+                        <Icon name="GripVertical" size={8} className="text-muted-foreground" />
+                        <span className={`text-[8px] font-mono font-bold mr-0.5 ${(item.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{item.counter || 1}</span>
+                        <span className={`text-${item.color}-700 font-semibold text-[10px]`}>
                           {item.surname}
                         </span>
                       </div>
@@ -2063,9 +2063,9 @@ export const DataTable = () => {
                           >
                             <Icon name="Unlink" size={10} className="text-muted-foreground hover:text-destructive" />
                           </Button>
-                          <div className={`border border-${linkedItem.color}-500 rounded px-2 py-1 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
-                            <span className={`text-[9px] font-mono font-bold mr-1 ${(linkedItem.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 1}</span>
-                            <span className={`text-${linkedItem.color}-700 font-semibold text-[11px]`}>
+                          <div className={`border border-${linkedItem.color}-500 rounded px-1.5 py-0.5 bg-${linkedItem.color}-50 transition-all duration-200 shadow-sm flex items-center gap-0.5`}>
+                            <span className={`text-[8px] font-mono font-bold mr-0.5 ${(linkedItem.counter || 1) === 4 ? 'text-red-600' : 'text-muted-foreground'}`}>{linkedItem.counter || 1}</span>
+                            <span className={`text-${linkedItem.color}-700 font-semibold text-[10px]`}>
                               {linkedItem.surname}
                             </span>
                           </div>
@@ -2082,10 +2082,10 @@ export const DataTable = () => {
 
       <div className="fixed bottom-4 right-4 z-50">
         <Card className="w-64 shadow-lg">
-          <div className="bg-secondary/80 backdrop-blur-sm p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <Icon name="Search" size={14} className="text-secondary-foreground" />
-              <h3 className="text-xs font-bold text-secondary-foreground">Поиск</h3>
+          <div className="bg-secondary/80 backdrop-blur-sm p-2">
+            <div className="flex items-center gap-1 mb-1">
+              <Icon name="Search" size={10} className="text-secondary-foreground" />
+              <h3 className="text-[10px] font-bold text-secondary-foreground">Поиск</h3>
             </div>
             <div className="relative">
               <Icon name="Search" size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
