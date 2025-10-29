@@ -535,18 +535,17 @@ export const DataTable = () => {
   const [linkingMode, setLinkingMode] = useState<{ source: 'reserve' | 'weekend' | 'otherJobs'; id: string } | null>(null);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadData = () => {
       try {
-        const response = await fetch('https://functions.poehali.dev/1d969b76-c527-4ad7-8b02-d60c191e1c38');
-        const result = await response.json();
-        
-        if (result.data && Object.keys(result.data).length > 0) {
-          if (result.data.data1) setData1(result.data.data1);
-          if (result.data.data2) setData2(result.data.data2);
-          if (result.data.reserve) setReserve(result.data.reserve);
-          if (result.data.weekend) setWeekend(result.data.weekend);
-          if (result.data.otherJobs) setOtherJobs(result.data.otherJobs);
-          if (result.data.surnameCounters) setSurnameCounters(result.data.surnameCounters);
+        const savedData = localStorage.getItem('schedule-data');
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          if (parsed.data1) setData1(parsed.data1);
+          if (parsed.data2) setData2(parsed.data2);
+          if (parsed.reserve) setReserve(parsed.reserve);
+          if (parsed.weekend) setWeekend(parsed.weekend);
+          if (parsed.otherJobs) setOtherJobs(parsed.otherJobs);
+          if (parsed.surnameCounters) setSurnameCounters(parsed.surnameCounters);
         }
       } catch (error) {
         console.error('Failed to load data:', error);
@@ -557,22 +556,17 @@ export const DataTable = () => {
   }, []);
 
   useEffect(() => {
-    const saveData = async () => {
+    const saveData = () => {
       try {
-        await fetch('https://functions.poehali.dev/1d969b76-c527-4ad7-8b02-d60c191e1c38', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            data: {
-              data1,
-              data2,
-              reserve,
-              weekend,
-              otherJobs,
-              surnameCounters
-            }
-          })
-        });
+        const dataToSave = {
+          data1,
+          data2,
+          reserve,
+          weekend,
+          otherJobs,
+          surnameCounters
+        };
+        localStorage.setItem('schedule-data', JSON.stringify(dataToSave));
       } catch (error) {
         console.error('Failed to save data:', error);
       }

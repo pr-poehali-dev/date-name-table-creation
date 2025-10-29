@@ -1,0 +1,24 @@
+{
+  "name": "Расписание смен",
+  "short_name": "Расписание",
+  "description": "Управление сменами и расписанием работников",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://cdn.poehali.dev/projects/56d91f28-869c-4e21-92cc-955b2576eb4e/files/17c6f050-9bcf-4d41-842b-1d1ee168ed82.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn.poehali.dev/projects/56d91f28-869c-4e21-92cc-955b2576eb4e/files/02a76302-19e2-49ef-9893-091badacd0f6.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
